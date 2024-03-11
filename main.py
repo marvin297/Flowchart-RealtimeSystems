@@ -1,6 +1,7 @@
 from tkinter import *
 import customtkinter
 
+
 class CustomButton(customtkinter.CTkButton):
     def __init__(self, master=None, **kwargs):
         super().__init__(master, **kwargs)
@@ -13,6 +14,7 @@ class CustomButton(customtkinter.CTkButton):
     def on_drag(self, event):
         self.place(x=self.root.winfo_pointerx() - self.root.winfo_rootx() - self.winfo_width() / 2, y=self.root.winfo_pointery() - self.root.winfo_rooty() - self.winfo_height() / 2)
         #self.configure(fg_color="red", text="Dragging")
+
 
 class CustomCanvas(Canvas):
     def __init__(self, master=None, **kwargs):
@@ -27,17 +29,55 @@ class CustomCanvas(Canvas):
         self.place(x=self.root.winfo_pointerx() - self.root.winfo_rootx() - self.winfo_width() / 2, y=self.root.winfo_pointery() - self.root.winfo_rooty() - self.winfo_height() / 2)
         #self.configure(fg_color="red", text="Dragging")
 
-def on_drag(event, canvas, inner_circle, outer_circle, line):
-    print('You clicked on the oval')
-    print(event.x, event.y)
-    x = event.x - 50
-    y = event.y - 50
-    canvas.coords(inner_circle, x + 5, y + 5, x + 95, y + 95)  # Adjust 100 according to your oval size
-    canvas.tag_raise(inner_circle, outer_circle)
-    canvas.tag_raise(outer_circle, line)
-    canvas.coords(outer_circle, x, y, x + 100, y + 100)  # Adjust 100 according to your oval size
 
-    canvas.coords(line, 0, 0, event.x, event.y)
+class TaskConnector:
+    def __init__(self, canvas, x, y, x2, y2):
+        self.canvas = canvas
+        self.line = canvas.create_line(x, y, x2, y2, width=5, fill="#ff335c")
+        self.canvas.pack()
+
+    def update_start(self, new_x, new_y):
+        x1, y1, x2, y2 = self.canvas.coords(self.line)
+        self.canvas.coords(self.line, new_x, new_y, x2, y2)
+
+    def update_end(self, new_x, new_y):
+        x1, y1, x2, y2 = self.canvas.coords(self.line)
+        self.canvas.coords(self.line, x1, y1, new_x, new_y)
+
+
+class DraggableTask:
+    def __init__(self, canvas, x, y, radius, root, connectors=None):
+        self.canvas = canvas
+        self.oval = canvas.create_oval(x - radius, y - radius, x + radius, y + radius, fill=root['bg'], outline="#ff335c", width=5)
+
+        self.connections = {
+            TaskConnector(self.canvas, 0, 0, 50, 50): "start",
+            TaskConnector(self.canvas, 100, 0, 50, 50): "end"
+        }
+
+        #self.canvas.tag_bind(self.oval, "<Button-1>", self.on_drag_start)
+        self.canvas.tag_bind(self.oval, "<B1-Motion>", lambda event: self.on_drag(event))
+        #self.canvas.tag_bind(self.oval, "<ButtonRelease-1>", self.on_drag_stop)
+
+        self.canvas.pack()
+
+    def on_drag(self, event):
+        print(event.x, event.y)
+        x = event.x - 50
+        y = event.y - 50
+        self.canvas.coords(self.oval, x + 5, y + 5, x + 95, y + 95)  # Adjust 100 according to your oval size
+        self.update_connections()
+
+    def update_connections(self):
+        for connection in self.connections:
+            self.canvas.tag_raise(self.oval, connection.line)
+            if self.connections[connection] == "start":
+                connection.update_start(self.get_position()[0] + 50, self.get_position()[1] + 50)
+            elif self.connections[connection] == "end":
+                connection.update_end(self.get_position()[0] + 50, self.get_position()[1] + 50)
+
+    def get_position(self):
+        return self.canvas.coords(self.oval)
 
 
 class App(customtkinter.CTk):
@@ -51,30 +91,12 @@ class App(customtkinter.CTk):
         # configure window
         self.title("CustomTkinter complex_example.py")
 
-        button = CustomButton(master=self, text="Click me!")
-
-        button.place(relx=0.5, rely=0.5, anchor=CENTER)
-
-        # bind button
-        # button.bind("<Button-1>", button_event)
-        button.bind("<B1-Motion>", button.on_drag)
-        button.bind("<ButtonRelease-1>", button.on_release)
-        button.pack()
-
         # Create a canvas object
         c = Canvas(self, bd=0, highlightthickness=0, background=self['bg'])
         c.pack(fill=BOTH, expand=True)
 
-        line = c.create_line(0, 0, 50, 50, width=5, fill="#ff335c")
-        # Draw an Oval in the canvas
-        outer_circle = c.create_oval(0, 0, 100, 100, fill="#ff335c")
-        inner_circle = c.create_oval(5, 5, 95, 95, fill=self['bg'])
+        DraggableTask(c, 50, 50, 50, self)
 
-        # c.bind("<B1-Motion>", c.on_drag)
-        # c.bind("<ButtonRelease-1>", c.on_release)
-        c.pack()
-
-        c.tag_bind(inner_circle, '<B1-Motion>', lambda event: on_drag(event, c, inner_circle, outer_circle, line))
 
 if __name__ == "__main__":
     app = App()
