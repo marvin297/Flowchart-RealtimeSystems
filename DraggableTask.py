@@ -13,8 +13,12 @@ class DraggableTask:
         self.activity_name = activity_name
         self.selected = False
 
-        self.name = canvas.create_text(x, y, text=task_name + activity_name, fill="#ff335c", font=("Arial", 12))
+        # Task cycle
+        self.task_current_cycle = 0
+        self.task_max_cycles = 1
 
+        # Task elements
+        self.name = canvas.create_text(x, y, text=task_name + activity_name, fill="#ff335c", font=("Arial", 12))
         self.selection_text = canvas.create_text(x, y - radius - 20, text="", fill="#00335c", font=("Arial", 12))
 
         self.canvas.tag_bind(self.oval, "<Button-1>", lambda event: self.clicked(task_name, activity_name))
@@ -25,6 +29,33 @@ class DraggableTask:
         # self.canvas.tag_bind(self.oval, "<ButtonRelease-1>", self.on_drag_stop)
 
         self.canvas.pack()
+
+    def try_step(self, start_time):
+        #  If the task is not in the middle of a cycle, then it can start a new cycle
+        if self.task_max_cycles > self.task_current_cycle > 0:
+            self.task_current_cycle += 1
+
+        # if all the end connections are ready to start, then the task starts a new cycle
+        amount_of_needed_connections_to_start = 0
+        amount_of_ready_connections_to_start = 0
+        for connection in self.connectors:
+            if self.connectors[connection] == "end":
+                amount_of_needed_connections_to_start += 1
+                if connection.semaphore_value > 0 and self.task_current_cycle == 0 and connection.last_change != start_time:
+                    amount_of_ready_connections_to_start += 1
+
+        if amount_of_needed_connections_to_start == amount_of_ready_connections_to_start and self.task_current_cycle == 0:
+            for connection in self.connectors:
+                if self.connectors[connection] == "end" and connection.semaphore_value > 0:
+                    self.task_current_cycle = 1
+                    connection.decrement_semaphore(start_time)
+
+        # If the task is done with the current cycle, it increments the semaphore of the end connections
+        if self.task_current_cycle == self.task_max_cycles:
+            for connection in self.connectors:
+                if self.connectors[connection] == "start":
+                    connection.increment_semaphore(start_time)
+            self.task_current_cycle = 0
 
     def on_drag(self, event):
         if DraggableTask.allow_selection:

@@ -2,11 +2,7 @@ from tkinter import filedialog
 import pandas as pd
 from DraggableTask import DraggableTask
 from TaskConnector import TaskConnector
-
-
-task_objects = []
-connector_objects = []
-
+from GeneralVariables import GeneralVariables
 
 def browseFiles(canvas, root):
     filename = filedialog.askopenfilename(title="Select a File", filetypes=(("Excel :)", "*.xlsx"), ("all files", "*.*")))
@@ -18,10 +14,9 @@ def browseFiles(canvas, root):
     # read by default 1st sheet of an excel file
     table_of_content = pd.read_excel(filename)
 
-    global task_objects
-    global connector_objects
-    task_objects = []
-    connector_objects = []
+    GeneralVariables.task_objects.clear()
+    GeneralVariables.connector_objects.clear()
+
     canvas.delete("all")
 
     for index, row in table_of_content.iterrows():
@@ -66,12 +61,14 @@ def browseFiles(canvas, root):
             break
         task = DraggableTask(canvas, task_name, activity_name, pos_x, pos_y, 50, root)
 
-        task_objects.append(task)
+        GeneralVariables.task_objects.append(task)
 
+    semaphores = []
     for index, row in table_of_content.iterrows():
         start_task_name = "Undefined"
         connector_name = "Undefined"
         end_task_name = "Undefined"
+        initial_value = 0
         for column, cell_value in row.iloc[7:].items():  # Start from index 7
             if type(cell_value) is float:
                 continue
@@ -82,6 +79,31 @@ def browseFiles(canvas, root):
                     connector_name = str(cell_value)
                 case "END":
                     end_task_name = str(cell_value)
+                case "INITIAL_VALUE":
+                    initial_value = int(cell_value)
+
+        semaphores.append([start_task_name, connector_name, end_task_name, initial_value, 0])
+
+    duplicates = []
+
+    for i in range(len(semaphores)):
+        semaphore = semaphores[i]
+        start_task_name = semaphore[0]
+        connector_name = semaphore[1]
+        end_task_name = semaphore[2]
+        initial_value = semaphore[3]
+        offset = semaphore[4]
+
+        for j in range(len(semaphores)):
+            semaphore2 = semaphores[j]
+            if semaphore2[0] == end_task_name:
+                if semaphore2[2] == start_task_name:
+                    if i not in duplicates and j not in duplicates:
+                        duplicates.append(i)
+                        duplicates.append(j)
+                        print("duplicate")
+                        semaphore2[4] = 50
+                        offset = -50
 
         if connector_name == "Undefined":
             continue
@@ -95,39 +117,43 @@ def browseFiles(canvas, root):
         if start_task_id[0] == end_task_id[0]:
             activity_connection = True
 
-        connector = TaskConnector(canvas, connector_name, activity_connection)
-        connector_objects.append([start_task_name, connector_name, end_task_name])
+        connector = TaskConnector(canvas, connector_name, semaphore_value=initial_value, activity_connection=activity_connection, text_color=root['bg'], offset=offset)
+        GeneralVariables.connector_objects.append([start_task_name, connector_name, end_task_name, initial_value])
 
-        for task in task_objects:
+        for task in GeneralVariables.task_objects:
             if (task.task_name + task.activity_name) == start_task_name:
                 task.add_connector(connector, "start")
-        for task in task_objects:
+        for task in GeneralVariables.task_objects:
             if (task.task_name + task.activity_name) == end_task_name:
                 task.add_connector(connector, "end")
 
-    for task in task_objects:
+
+    for task in GeneralVariables.task_objects:
         task.update_connections()
 
 
 def saveFile():
-    task_values = [task.task_name for task in task_objects]
-    activity_values = [task.activity_name for task in task_objects]
-    cycle_values = [0 for i in range(len(task_objects))]
-    priority_values = [0 for i in range(len(task_objects))]
-    pos_x_values = [task.get_position()[0]+50 for task in task_objects]
-    pos_y_values = [task.get_position()[1]+50 for task in task_objects]
+    task_values = [task.task_name for task in GeneralVariables.task_objects]
+    activity_values = [task.activity_name for task in GeneralVariables.task_objects]
+    cycle_values = [0 for i in range(len(GeneralVariables.task_objects))]
+    priority_values = [0 for i in range(len(GeneralVariables.task_objects))]
+    pos_x_values = [task.get_position()[0]+50 for task in GeneralVariables.task_objects]
+    pos_y_values = [task.get_position()[1]+50 for task in GeneralVariables.task_objects]
 
-    start_values = [connector[0] for connector in connector_objects]
-    con_values = [connector[1] for connector in connector_objects]
-    end_values = [connector[2] for connector in connector_objects]
+    start_values = [connector[0] for connector in GeneralVariables.connector_objects]
+    con_values = [connector[1] for connector in GeneralVariables.connector_objects]
+    end_values = [connector[2] for connector in GeneralVariables.connector_objects]
+    initial_values = [connector[3] for connector in GeneralVariables.connector_objects]
 
-    if len(task_objects) > len(connector_objects):
-        for i in range(len(task_objects) - len(connector_objects)):
+    if len(GeneralVariables.task_objects) > len(GeneralVariables.connector_objects):
+        for i in range(len(GeneralVariables.task_objects) - len(GeneralVariables.connector_objects)):
             start_values.append(None)
             con_values.append(None)
             end_values.append(None)
-    elif len(task_objects) < len(connector_objects):
-        for i in range(len(connector_objects) - len(task_objects)):
+            initial_values.append(None)
+
+    elif len(GeneralVariables.task_objects) < len(GeneralVariables.connector_objects):
+        for i in range(len(GeneralVariables.connector_objects) - len(GeneralVariables.task_objects)):
             task_values.append(None)
             activity_values.append(None)
             cycle_values.append(None)
@@ -145,7 +171,8 @@ def saveFile():
         '': [None for i in range(len(task_values))],
         'START': start_values,
         'CON_NAME': con_values,
-        'END': end_values
+        'END': end_values,
+        'INITIAL_VALUE': initial_values
     }
     df = pd.DataFrame(data)
 
