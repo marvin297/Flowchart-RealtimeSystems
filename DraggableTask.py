@@ -4,7 +4,7 @@ class DraggableTask:
     selectedOrigin = None
     selectedTarget = None
 
-    def __init__(self, canvas, task_name, activity_name, x, y, radius, root):
+    def __init__(self, canvas, task_name, activity_name, x, y, radius, root, task_max_cycles):
         self.canvas = canvas
         self.oval = canvas.create_oval(x - radius, y - radius, x + radius, y + radius, fill=root['bg'],
                                        outline="#ff335c", width=5)
@@ -15,10 +15,10 @@ class DraggableTask:
 
         # Task cycle
         self.task_current_cycle = 0
-        self.task_max_cycles = 1
+        self.task_max_cycles = task_max_cycles
 
         # Task elements
-        self.name = canvas.create_text(x, y, text=task_name + activity_name, fill="#ff335c", font=("Arial", 12))
+        self.name = canvas.create_text(x, y, text=self.task_name + self.activity_name + " " + str(self.task_current_cycle) + "/" + str(self.task_max_cycles), fill="#ff335c", font=("Arial", 12))
         self.selection_text = canvas.create_text(x, y - radius - 20, text="", fill="#00335c", font=("Arial", 12))
 
         self.canvas.tag_bind(self.oval, "<Button-1>", lambda event: self.clicked(task_name, activity_name))
@@ -41,7 +41,7 @@ class DraggableTask:
         for connection in self.connectors:
             if self.connectors[connection] == "end":
                 amount_of_needed_connections_to_start += 1
-                if connection.semaphore_value > 0 and self.task_current_cycle == 0 and connection.last_change != start_time:
+                if connection.semaphore_value > 0 and self.task_current_cycle == 0 and connection.last_change != start_time: # check time if semaphore was changed this step
                     amount_of_ready_connections_to_start += 1
 
         if amount_of_needed_connections_to_start == amount_of_ready_connections_to_start and self.task_current_cycle == 0:
@@ -56,6 +56,8 @@ class DraggableTask:
                 if self.connectors[connection] == "start":
                     connection.increment_semaphore(start_time)
             self.task_current_cycle = 0
+
+        self.canvas.itemconfig(self.name, text=self.task_name + self.activity_name + " " + str(self.task_current_cycle) + "/" + str(self.task_max_cycles))
 
     def on_drag(self, event):
         if DraggableTask.allow_selection:

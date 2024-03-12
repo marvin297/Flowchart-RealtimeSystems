@@ -20,11 +20,13 @@ class TaskConnector:
 
     def decrement_semaphore(self, change_time):
         self.last_change = change_time
+
         self.semaphore_value -= 1
         self.canvas.itemconfig(self.semaphore_text, text=str(self.semaphore_value))
 
     def increment_semaphore(self, change_time):
         self.last_change = change_time
+
         self.semaphore_value += 1
         self.canvas.itemconfig(self.semaphore_text, text=str(self.semaphore_value))
 

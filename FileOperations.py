@@ -24,6 +24,7 @@ def browseFiles(canvas, root):
         activity_name = ""
         pos_x = 50
         pos_y = 50
+        cycles = 1
 
         for column, cell_value in row.iloc[:7].items():  # stop after index 6
             if str(column).startswith("Unnamed: "):
@@ -42,7 +43,7 @@ def browseFiles(canvas, root):
                         activity_name = str(cell_value)
 
                 case "CYCLES":
-                    print("Cycles")
+                    cycles = int(cell_value)
 
                 case "PRIORITY":
                     print("Priority")
@@ -59,7 +60,7 @@ def browseFiles(canvas, root):
 
         if task_name == "Undefined":
             break
-        task = DraggableTask(canvas, task_name, activity_name, pos_x, pos_y, 50, root)
+        task = DraggableTask(canvas, task_name, activity_name, pos_x, pos_y, 50, root, cycles)
 
         GeneralVariables.task_objects.append(task)
 
@@ -85,7 +86,6 @@ def browseFiles(canvas, root):
         semaphores.append([start_task_name, connector_name, end_task_name, initial_value, 0])
 
     duplicates = []
-
     for i in range(len(semaphores)):
         semaphore = semaphores[i]
         start_task_name = semaphore[0]
@@ -135,7 +135,7 @@ def browseFiles(canvas, root):
 def saveFile():
     task_values = [task.task_name for task in GeneralVariables.task_objects]
     activity_values = [task.activity_name for task in GeneralVariables.task_objects]
-    cycle_values = [0 for i in range(len(GeneralVariables.task_objects))]
+    cycle_values = [task.task_max_cycles for task in GeneralVariables.task_objects]
     priority_values = [0 for i in range(len(GeneralVariables.task_objects))]
     pos_x_values = [task.get_position()[0]+50 for task in GeneralVariables.task_objects]
     pos_y_values = [task.get_position()[1]+50 for task in GeneralVariables.task_objects]
