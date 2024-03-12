@@ -1,6 +1,7 @@
 from tkinter import *
 import customtkinter
 from FileOperations import browseFiles, saveFile
+from DraggableTask import DraggableTask
 
 
 class App(customtkinter.CTk):
@@ -21,6 +22,7 @@ class App(customtkinter.CTk):
         load_file_btn = customtkinter.CTkButton(c, text="Load file", command=lambda: browseFiles(c, self)).pack()
         store_file_btn = customtkinter.CTkButton(c, text="Store file", command=saveFile).pack()
         next_step_btn = customtkinter.CTkButton(c, text="Next step", command=lambda: print("Stepping...")).pack()
+        edit_btn = customtkinter.CTkButton(c, text="Edit", command=lambda: DraggableTask.switch_selection(c)).pack()
 
 
 if __name__ == "__main__":

@@ -10,6 +10,9 @@ connector_objects = []
 
 def browseFiles(canvas, root):
     filename = filedialog.askopenfilename(title="Select a File", filetypes=(("Excel :)", "*.xlsx"), ("all files", "*.*")))
+    if filename == "":
+        return
+
     import math
 
     # read by default 1st sheet of an excel file
