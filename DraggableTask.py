@@ -76,8 +76,9 @@ class DraggableTask:
             self.canvas.itemconfig(self.oval, outline="#00335c")
             DraggableTask.selectedTasks += 1
         else:
-            if DraggableTask.selectedOrigin.task_name + DraggableTask.selectedOrigin.activity_name == task_name + activity_name:
-                DraggableTask.selectedOrigin = None
+            if DraggableTask.selectedOrigin is not None:
+                if DraggableTask.selectedOrigin.task_name + DraggableTask.selectedOrigin.activity_name == task_name + activity_name:
+                    DraggableTask.selectedOrigin = None
             else:
                 DraggableTask.selectedTarget = None
 
@@ -92,16 +93,17 @@ class DraggableTask:
         DraggableTask.allow_selection = not DraggableTask.allow_selection
 
         if not DraggableTask.allow_selection:
-            canvas.itemconfig(DraggableTask.selectedOrigin.selection_text, text="")
-            canvas.itemconfig(DraggableTask.selectedTarget.selection_text, text="")
-            canvas.itemconfig(DraggableTask.selectedOrigin.oval, outline="#ff335c")
-            canvas.itemconfig(DraggableTask.selectedTarget.oval, outline="#ff335c")
+            if DraggableTask.selectedOrigin is not None:
+                canvas.itemconfig(DraggableTask.selectedOrigin.selection_text, text="")
+                canvas.itemconfig(DraggableTask.selectedOrigin.oval, outline="#ff335c")
+                DraggableTask.selectedOrigin.selected = False
+                DraggableTask.selectedOrigin = None
 
-            DraggableTask.selectedOrigin.selected = False
-            DraggableTask.selectedTarget.selected = False
-
-            DraggableTask.selectedTarget = None
-            DraggableTask.selectedOrigin = None
+            if DraggableTask.selectedTarget is not None:
+                canvas.itemconfig(DraggableTask.selectedTarget.selection_text, text="")
+                canvas.itemconfig(DraggableTask.selectedTarget.oval, outline="#ff335c")
+                DraggableTask.selectedTarget.selected = False
+                DraggableTask.selectedTarget = None
 
             DraggableTask.selectedTasks = 0
 
