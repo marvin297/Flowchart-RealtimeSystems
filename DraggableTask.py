@@ -8,7 +8,9 @@ class DraggableTask:
 
     def __init__(self, task_name, activity_name, x, y, radius, task_max_cycles):
         self.oval = GeneralVariables.canvas.create_oval(x - radius, y - radius, x + radius, y + radius, fill=GeneralVariables.root['bg'],
-                                       outline="#ff335c", width=5)
+                                       outline=GeneralVariables.task_color, width=2)
+
+        #self.oval = GeneralVariables.canvas.create_oval(x - radius, y - radius, x + radius, y + radius, fill=GeneralVariables.task_color, outline=GeneralVariables.task_color, width=2)
         self.connectors = {}
         self.task_name = task_name
         self.activity_name = activity_name
@@ -21,14 +23,18 @@ class DraggableTask:
         self.task_max_cycles = task_max_cycles
 
         # Task elements
-        self.name = GeneralVariables.canvas.create_text(x, y, text=self.task_name + self.activity_name + " " + str(self.task_current_cycle) + "/" + str(self.task_max_cycles), fill="#ff335c", font=("Arial", 12))
+        self.name_label = GeneralVariables.canvas.create_text(x, y - 20 if self.activity_name != "" else y - 10, text="Task " + self.task_name, fill="white", font=("Montserrat Black", 12))
+        if self.activity_name != "":
+            self.activity_label = GeneralVariables.canvas.create_text(x, y, text="Activity " + self.activity_name, fill="white", font=("Montserrat Black", 9))
+        self.cycle_label = GeneralVariables.canvas.create_text(x, y + 20 if self.activity_name != "" else y + 10, text="Cycle " + str(self.task_current_cycle) + "/" + str(self.task_max_cycles), fill="white", font=("Montserrat Light", 8))
+
         self.selection_text = GeneralVariables.canvas.create_text(x, y - radius - 20, text="", fill="#00335c", font=("Arial", 12))
 
         GeneralVariables.canvas.tag_bind(self.oval, "<Button-1>", lambda event: self.clicked(task_name, activity_name))
-        GeneralVariables.canvas.tag_bind(self.name, "<Button-1>", lambda event: self.clicked(task_name, activity_name))
+        GeneralVariables.canvas.tag_bind(self.name_label, "<Button-1>", lambda event: self.clicked(task_name, activity_name))
 
         GeneralVariables.canvas.tag_bind(self.oval, "<B1-Motion>", lambda event: self.on_drag(event))
-        GeneralVariables.canvas.tag_bind(self.name, "<B1-Motion>", lambda event: self.on_drag(event))
+        GeneralVariables.canvas.tag_bind(self.name_label, "<B1-Motion>", lambda event: self.on_drag(event))
         # self.canvas.tag_bind(self.oval, "<ButtonRelease-1>", self.on_drag_stop)
 
         GeneralVariables.canvas.pack()
@@ -96,7 +102,11 @@ class DraggableTask:
         x = event.x - 50
         y = event.y - 50
         GeneralVariables.canvas.coords(self.oval, x, y, x + 100, y + 100)  # Adjust 100 according to your oval size
-        GeneralVariables.canvas.coords(self.name, x + 50, y + 50)
+        GeneralVariables.canvas.coords(self.name_label, x + 50, y + 50 - 20 if self.activity_name != "" else y + 50 - 10)
+        if self.activity_name != "":
+            GeneralVariables.canvas.coords(self.activity_label, x + 50, y + 50)
+        GeneralVariables.canvas.coords(self.cycle_label, x + 50, y + 50 + 20 if self.activity_name != "" else y + 50 + 10)
+
         GeneralVariables.canvas.coords(self.selection_text, x + 50, y - 20)
         self.update_connections()
 
@@ -104,13 +114,15 @@ class DraggableTask:
             mutex.update_visuals()
 
     def update_status_text(self):
-        GeneralVariables.canvas.itemconfig(self.name, text=self.task_name + self.activity_name + " " + str(
-            self.task_current_cycle) + "/" + str(self.task_max_cycles))
+        GeneralVariables.canvas.itemconfig(self.cycle_label, text="Cycle " + str(self.task_current_cycle) + "/" + str(self.task_max_cycles))
 
     def update_connections(self):
         for connection in self.connectors:
             GeneralVariables.canvas.tag_raise(self.oval, connection.line)
-            GeneralVariables.canvas.tag_raise(self.name, self.oval)
+            GeneralVariables.canvas.tag_raise(self.name_label, self.oval)
+            if self.activity_name != "":
+                GeneralVariables.canvas.tag_raise(self.activity_label, self.oval)
+            GeneralVariables.canvas.tag_raise(self.cycle_label)
             if self.connectors[connection] == "start":
                 connection.update_start(self.get_position()[0] + 50, self.get_position()[1] + 50)
                 connection.update_end(0, 0, True)
@@ -153,7 +165,7 @@ class DraggableTask:
                 DraggableTask.selectedTarget = None
 
             GeneralVariables.canvas.itemconfig(self.selection_text, text="")
-            GeneralVariables.canvas.itemconfig(self.oval, outline="#ff335c")
+            GeneralVariables.canvas.itemconfig(self.oval, outline=GeneralVariables.task_color)
             DraggableTask.selectedTasks -= 1
 
         print(DraggableTask.selectedTasks)

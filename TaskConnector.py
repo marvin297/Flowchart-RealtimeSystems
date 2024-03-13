@@ -1,12 +1,13 @@
 from GeneralVariables import GeneralVariables
 
+
 class TaskConnector:
     def __init__(self, name, semaphore_value=0, activity_connection=False, offset=0):
         self.name = name
         self.circle_radius = 50
-        self.line = GeneralVariables.canvas.create_line(0, 0, 0, 0, width=5, fill="#ff335c", arrow="last", arrowshape=(25, 25, 10)) \
+        self.line = GeneralVariables.canvas.create_line(0, 0, 0, 0, width=5, fill=GeneralVariables.arrow_color, arrow="last", arrowshape=(25, 25, 10), smooth=True) \
             if not activity_connection \
-            else GeneralVariables.canvas.create_line(0, 0, 0, 0, width=2, fill="#ff9233", arrow="last",arrowshape=(10, 25, 10))
+            else GeneralVariables.canvas.create_line(0, 0, 0, 0, width=2, fill=GeneralVariables.activity_arrow_color, arrow="last", arrowshape=(10, 25, 10), smooth=True)
         self.end_x = 0
         self.end_y = 0
         self.semaphore_value = semaphore_value
@@ -14,8 +15,8 @@ class TaskConnector:
 
         self.offset = offset
 
-        self.semaphore_text = GeneralVariables.canvas.create_text(0, 0, text=str(semaphore_value), fill=GeneralVariables.root['bg'], font=("Arial", 12, "bold"))
-        self.semaphore_bg = GeneralVariables.canvas.create_oval(0, 0, 0, 0, fill="#ff335c", outline="#ff335c")
+        self.semaphore_text = GeneralVariables.canvas.create_text(0, 0, text=str(semaphore_value), fill=GeneralVariables.root['bg'], font=("Montserrat Light", 12, "bold"))
+        self.semaphore_bg = GeneralVariables.canvas.create_oval(0, 0, 0, 0, fill=GeneralVariables.arrow_color if not activity_connection else GeneralVariables.activity_arrow_color, outline=GeneralVariables.arrow_color if not activity_connection else GeneralVariables.activity_arrow_color)
 
         GeneralVariables.canvas.pack()
 
