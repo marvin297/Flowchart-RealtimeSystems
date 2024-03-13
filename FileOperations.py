@@ -1,10 +1,12 @@
 from tkinter import filedialog
 import pandas as pd
 from DraggableTask import DraggableTask
+from Mutex import Mutex
 from TaskConnector import TaskConnector
 from GeneralVariables import GeneralVariables
 
-def browseFiles(canvas, root):
+
+def browse_files():
     filename = filedialog.askopenfilename(title="Select a File", filetypes=(("Excel :)", "*.xlsx"), ("all files", "*.*")))
     if filename == "":
         return
@@ -14,10 +16,8 @@ def browseFiles(canvas, root):
     # read by default 1st sheet of an excel file
     table_of_content = pd.read_excel(filename)
 
-    GeneralVariables.task_objects.clear()
-    GeneralVariables.connector_objects.clear()
-
-    canvas.delete("all")
+    GeneralVariables.clear_general_variables()
+    GeneralVariables.canvas.delete("all")
 
     for index, row in table_of_content.iterrows():
         task_name = "Undefined"
@@ -25,8 +25,9 @@ def browseFiles(canvas, root):
         pos_x = 50
         pos_y = 50
         cycles = 1
+        mutexes = []
 
-        for column, cell_value in row.iloc[:7].items():  # stop after index 6
+        for column, cell_value in row.iloc[:8].items():  # stop after index 6
             if str(column).startswith("Unnamed: "):
                 break
 
@@ -48,6 +49,21 @@ def browseFiles(canvas, root):
                 case "PRIORITY":
                     print("Priority")
 
+                case "MUTEX_LIST":
+                    if type(cell_value) is not float:
+                        mutex_string = str(cell_value)
+                        mutex_names = mutex_string.split(",")
+                        for mutex_name in mutex_names:
+                            if mutex_name not in GeneralVariables.mutex_objects:
+                                GeneralVariables.mutex_objects.update({
+                                    mutex_name: Mutex(mutex_name)
+                                })
+
+                            mutexes.append(GeneralVariables.mutex_objects[mutex_name])
+                    else:
+                        pass
+                    print("Mutex")
+
                 case "POSX":
                     if not math.isnan(cell_value):
                         pos_x = cell_value
@@ -60,7 +76,11 @@ def browseFiles(canvas, root):
 
         if task_name == "Undefined":
             break
-        task = DraggableTask(canvas, task_name, activity_name, pos_x, pos_y, 50, root, cycles)
+        task = DraggableTask(task_name, activity_name, pos_x, pos_y, 50, cycles)
+        if len(mutexes) > 0:
+            for mutex in mutexes:
+                task.add_mutex(mutex)
+                mutex.add_task(task)
 
         GeneralVariables.task_objects.append(task)
 
@@ -70,7 +90,7 @@ def browseFiles(canvas, root):
         connector_name = "Undefined"
         end_task_name = "Undefined"
         initial_value = 0
-        for column, cell_value in row.iloc[7:].items():  # Start from index 7
+        for column, cell_value in row.iloc[8:].items():  # Start from index 7
             if type(cell_value) is float:
                 continue
             match column:
@@ -117,7 +137,7 @@ def browseFiles(canvas, root):
         if start_task_id[0] == end_task_id[0]:
             activity_connection = True
 
-        connector = TaskConnector(canvas, connector_name, semaphore_value=initial_value, activity_connection=activity_connection, text_color=root['bg'], offset=offset)
+        connector = TaskConnector(connector_name, semaphore_value=initial_value, activity_connection=activity_connection, offset=offset)
         GeneralVariables.connector_objects.append([start_task_name, connector_name, end_task_name, initial_value])
 
         for task in GeneralVariables.task_objects:
@@ -127,16 +147,19 @@ def browseFiles(canvas, root):
             if (task.task_name + task.activity_name) == end_task_name:
                 task.add_connector(connector, "end")
 
-
     for task in GeneralVariables.task_objects:
         task.update_connections()
 
+    for mutex in GeneralVariables.mutex_objects:
+        GeneralVariables.mutex_objects[mutex].update_visuals()
 
-def saveFile():
+
+def save_file():
     task_values = [task.task_name for task in GeneralVariables.task_objects]
     activity_values = [task.activity_name for task in GeneralVariables.task_objects]
     cycle_values = [task.task_max_cycles for task in GeneralVariables.task_objects]
     priority_values = [0 for i in range(len(GeneralVariables.task_objects))]
+    mutex_values = [",".join([mutex.name for mutex in task.mutexes]) for task in GeneralVariables.task_objects]
     pos_x_values = [task.get_position()[0]+50 for task in GeneralVariables.task_objects]
     pos_y_values = [task.get_position()[1]+50 for task in GeneralVariables.task_objects]
 
@@ -157,6 +180,7 @@ def saveFile():
             task_values.append(None)
             activity_values.append(None)
             cycle_values.append(None)
+            mutex_values.append(None)
             priority_values.append(None)
             pos_x_values.append(None)
             pos_y_values.append(None)
@@ -166,6 +190,7 @@ def saveFile():
         'ACTIVITY': activity_values,
         'CYCLES': cycle_values,
         'PRIORITY': priority_values,
+        'MUTEX_LIST': mutex_values,
         'POSX': pos_x_values,
         'POSY': pos_y_values,
         '': [None for i in range(len(task_values))],
