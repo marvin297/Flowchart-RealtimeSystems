@@ -32,9 +32,15 @@ class DraggableTask:
 
         GeneralVariables.canvas.tag_bind(self.oval, "<Button-1>", lambda event: self.clicked(task_name, activity_name))
         GeneralVariables.canvas.tag_bind(self.name_label, "<Button-1>", lambda event: self.clicked(task_name, activity_name))
+        if self.activity_name != "":
+            GeneralVariables.canvas.tag_bind(self.activity_label, "<Button-1>", lambda event: self.clicked(task_name, activity_name))
+        GeneralVariables.canvas.tag_bind(self.cycle_label, "<Button-1>", lambda event: self.clicked(task_name, activity_name))
 
         GeneralVariables.canvas.tag_bind(self.oval, "<B1-Motion>", lambda event: self.on_drag(event))
         GeneralVariables.canvas.tag_bind(self.name_label, "<B1-Motion>", lambda event: self.on_drag(event))
+        if self.activity_name != "":
+            GeneralVariables.canvas.tag_bind(self.activity_label, "<B1-Motion>", lambda event: self.on_drag(event))
+        GeneralVariables.canvas.tag_bind(self.cycle_label, "<B1-Motion>", lambda event: self.on_drag(event))
         # self.canvas.tag_bind(self.oval, "<ButtonRelease-1>", self.on_drag_stop)
 
         GeneralVariables.canvas.pack()
