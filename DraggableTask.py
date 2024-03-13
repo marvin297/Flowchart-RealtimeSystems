@@ -62,7 +62,7 @@ class DraggableTask:
         self.update_status_text()
 
     def attend(self, amount_of_needed_connections_to_start, amount_of_ready_connections_to_start):
-        if amount_of_needed_connections_to_start == amount_of_ready_connections_to_start and self.task_current_cycle == 0:
+        if amount_of_needed_connections_to_start == amount_of_ready_connections_to_start and self.task_current_cycle == 0 and amount_of_needed_connections_to_start > 0:
             if len(self.mutexes) > 0:
                 for mutex in self.mutexes:
                     mutex.attend(attendee=self)
