@@ -13,7 +13,7 @@ class App(customtkinter.CTk):
         GeneralVariables.root = self
 
         customtkinter.set_appearance_mode("system")
-        customtkinter.set_default_color_theme("green")
+        customtkinter.set_default_color_theme("blue")
         self.geometry("800x800")
 
         # configure window

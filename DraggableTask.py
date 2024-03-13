@@ -1,5 +1,6 @@
 from GeneralVariables import GeneralVariables
 
+
 class DraggableTask:
     allow_selection = False
     selectedTasks = 0
