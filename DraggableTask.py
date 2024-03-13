@@ -184,13 +184,13 @@ class DraggableTask:
         if not DraggableTask.allow_selection:
             if DraggableTask.selectedOrigin is not None:
                 GeneralVariables.canvas.itemconfig(DraggableTask.selectedOrigin.selection_text, text="")
-                GeneralVariables.canvas.itemconfig(DraggableTask.selectedOrigin.oval, outline="#ff335c")
+                GeneralVariables.canvas.itemconfig(DraggableTask.selectedOrigin.oval, outline=GeneralVariables.task_color)
                 DraggableTask.selectedOrigin.selected = False
                 DraggableTask.selectedOrigin = None
 
             if DraggableTask.selectedTarget is not None:
                 GeneralVariables.canvas.itemconfig(DraggableTask.selectedTarget.selection_text, text="")
-                GeneralVariables.canvas.itemconfig(DraggableTask.selectedTarget.oval, outline="#ff335c")
+                GeneralVariables.canvas.itemconfig(DraggableTask.selectedTarget.oval, outline=GeneralVariables.task_color)
                 DraggableTask.selectedTarget.selected = False
                 DraggableTask.selectedTarget = None
 
