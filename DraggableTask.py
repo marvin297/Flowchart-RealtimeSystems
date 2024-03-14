@@ -74,6 +74,7 @@ class DraggableTask:
                 connection.decrement_semaphore(GeneralVariables.step_number)
 
         self.update_status_text()
+        self.granted_mutexes = 0
 
     def attend(self, amount_of_needed_connections_to_start, amount_of_ready_connections_to_start):
         if amount_of_needed_connections_to_start == amount_of_ready_connections_to_start and self.task_current_cycle == 0 and amount_of_needed_connections_to_start > 0:
