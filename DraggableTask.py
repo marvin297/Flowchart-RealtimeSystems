@@ -18,6 +18,7 @@ class DraggableTask:
         self.selected = False
 
         self.mutexes = []
+        self.granted_mutexes = 0
 
         # Task cycle
         self.task_current_cycle = 0
@@ -26,7 +27,7 @@ class DraggableTask:
         # Task elements
         self.name_label = GeneralVariables.canvas.create_text(x, y - 20 if self.activity_name != "" else y - 10, text="Task " + self.task_name, fill="white", font=("Montserrat Black", 12))
         if self.activity_name != "":
-            self.activity_label = GeneralVariables.canvas.create_text(x, y, text="Activity " + self.activity_name, fill="white", font=("Montserrat Black", 9))
+            self.activity_label = GeneralVariables.canvas.create_text(x, y, text="Activity " + self.activity_name, fill="white", font=("Montserrat Black", 10))
         self.cycle_label = GeneralVariables.canvas.create_text(x, y + 20 if self.activity_name != "" else y + 10, text="Cycle " + str(self.task_current_cycle) + "/" + str(self.task_max_cycles), fill="white", font=("Montserrat Light", 8))
 
         self.selection_text = GeneralVariables.canvas.create_text(x, y - radius - 20, text="", fill="#00335c", font=("Arial", 12))
@@ -84,7 +85,9 @@ class DraggableTask:
 
     def grant_access(self):
         print("Access granted to", self.task_name, self.activity_name)
-        self._start_cycle()
+        self.granted_mutexes += 1
+        if len(self.mutexes) == self.granted_mutexes:
+            self._start_cycle()
 
     def add_mutex(self, mutex):
         print("Added mutex " + mutex.name + " to task " + self.task_name + self.activity_name)

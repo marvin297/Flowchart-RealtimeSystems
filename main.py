@@ -19,6 +19,11 @@ class App(customtkinter.CTk):
         # configure window
         self.title("Flowchart Editor")
 
+        # fonts
+        from tkextrafont import Font
+        GeneralVariables.font_black = Font(file="fonts/Montserrat-Black.ttf", family="Montserrat")
+        GeneralVariables.font_light_normal = Font(file="fonts/Montserrat-Light.ttf", family="Montserrat")
+
         # Create a canvas object
         canvas = Canvas(self, bd=0, highlightthickness=0, background=self['bg'])
         canvas.pack(fill=BOTH, expand=True)

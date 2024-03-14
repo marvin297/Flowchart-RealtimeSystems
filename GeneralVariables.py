@@ -1,4 +1,3 @@
-import pyglet
 
 
 class GeneralVariables:
@@ -9,14 +8,14 @@ class GeneralVariables:
     canvas = None
     root = None
 
+    font_black = None
+    font_light = None
+
     arrow_color = "#767676"
     activity_arrow_color = "#029cff"
     mutex_color = "#464646"
 
     task_color = "#029cff"
-
-    pyglet.font.add_file('fonts/Montserrat-Black.ttf')
-    pyglet.font.add_file('fonts/Montserrat-Light.ttf')
 
     @staticmethod
     def clear_general_variables():
