@@ -15,8 +15,6 @@ class Mutex:
         self.locked_text = GeneralVariables.canvas.create_text(0, 0, text=("Locked" if self.lock else "Unlocked"), fill="white",
                                                  font=("Montserrat Light", 8, "bold"))
 
-        #self.mutex_bg = GeneralVariables.canvas.create_oval(0, 0, 0, 0, fill="#ff335c", outline="#ff335c")
-
         self.mutex_bg = GeneralVariables.canvas.create_polygon([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], fill=GeneralVariables.mutex_color, outline=GeneralVariables.mutex_color)
 
         GeneralVariables.canvas.pack()

@@ -66,6 +66,7 @@ class App(customtkinter.CTk):
 
         task_input = StringVar()
         activity_input = StringVar()
+        cycles_input = IntVar()
 
         sidebar_title = Label(App.sidebar, text="Editor", font=("Montserrat Light", 20), bg="#2A2A2A", fg="white",
                               width=15)
@@ -89,6 +90,17 @@ class App(customtkinter.CTk):
         activity_name_input = Entry(activity_name_frame, font=("Montserrat Light", 10), bd=0, bg="#303030", fg="white",
                                     insertbackground="white", width=20, textvariable=activity_input, borderwidth=10, relief="flat")
         activity_name_input.pack(side=TOP, anchor=N, padx=15, pady=15)
+
+        cycles_frame = Frame(App.sidebar, bd=0, bg="#2A2A2A", height=30)
+        cycles_frame.place(relx=0, rely=0, x=15, y=320)
+        cycles_title = Label(cycles_frame, text="Amount of cycles", font=("Montserrat Light", 10),
+                                    bg="#2A2A2A",
+                                    fg="white", width=15)
+        cycles_title.pack(side=TOP, anchor=N, padx=0, pady=5)
+        cycles_input = Entry(cycles_frame, font=("Montserrat Light", 10), bd=0, bg="#303030", fg="white",
+                                    insertbackground="white", width=20, textvariable=cycles_input, borderwidth=10,
+                                    relief="flat")
+        cycles_input.pack(side=TOP, anchor=N, padx=15, pady=15)
 
         # Create a frame to simulate the button appearance
         button_frame = Frame(App.sidebar, bg="#303030", bd=1, relief="solid",
@@ -119,8 +131,6 @@ class App(customtkinter.CTk):
     def clear_canvas():
         GeneralVariables.clear_general_variables()
         GeneralVariables.canvas.delete("all")
-
-        App.hide_sidebar()
 
     @staticmethod
     def step():
