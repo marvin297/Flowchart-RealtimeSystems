@@ -10,6 +10,9 @@ class GeneralVariables:
     root = None
 
     sidebar = None
+    sidebar_edit_task_container = None
+    sidebar_add_connection_container = None
+    sidebar_add_mutex_container = None
     sidebar_task_input = None
     sidebar_activity_input = None
     sidebar_cycles_input = None
@@ -75,7 +78,20 @@ class GeneralVariables:
 
     @staticmethod
     def _update_sidebar():
-        if len(GeneralVariables.selected_tasks) == 1:
+        if len(GeneralVariables.selected_tasks) > 0:
+            if len(GeneralVariables.selected_tasks) == 1:
+                GeneralVariables.sidebar_edit_task_container.pack(fill="both", expand=True)
+                GeneralVariables.sidebar_add_connection_container.pack_forget()
+                GeneralVariables.sidebar_add_mutex_container.pack_forget()
+            elif len(GeneralVariables.selected_tasks) == 2:
+                GeneralVariables.sidebar_add_connection_container.pack(fill="both", expand=True)
+                GeneralVariables.sidebar_edit_task_container.pack_forget()
+                GeneralVariables.sidebar_add_mutex_container.pack_forget()
+            else:
+                GeneralVariables.sidebar_add_mutex_container.pack(fill="both", expand=True)
+                GeneralVariables.sidebar_edit_task_container.pack_forget()
+                GeneralVariables.sidebar_add_connection_container.pack_forget()
+
             GeneralVariables.toggle_sidebar(True)
 
             GeneralVariables.sidebar_task_input.set(list(GeneralVariables.selected_tasks.keys())[0].task_name)

@@ -178,3 +178,5 @@ class DraggableTask:
             task.selected = False
 
         GeneralVariables.selected_tasks.clear()
+
+        GeneralVariables.toggle_sidebar(show=False)
