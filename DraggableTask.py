@@ -7,7 +7,7 @@ class DraggableTask:
     selectedOrigin = None
     selectedTarget = None
 
-    def __init__(self, task_name, activity_name, x, y, radius, task_max_cycles):
+    def __init__(self, task_name, activity_name, x, y, radius, task_max_cycles, priority):
         self.oval = GeneralVariables.canvas.create_oval(x - radius, y - radius, x + radius, y + radius, fill=GeneralVariables.root['bg'],
                                        outline=GeneralVariables.task_color, width=2)
 
@@ -19,6 +19,7 @@ class DraggableTask:
 
         self.mutexes = []
         self.granted_mutexes = 0
+        self.priority = priority
 
         # Task cycle
         self.task_current_cycle = 0
