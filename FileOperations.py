@@ -160,7 +160,7 @@ def save_file():
     activity_values = [task.activity_name for task in GeneralVariables.task_objects]
     cycle_values = [task.task_max_cycles for task in GeneralVariables.task_objects]
     priority_values = [0 for i in range(len(GeneralVariables.task_objects))]
-    mutex_values = [",".join([mutex.name_label for mutex in task.mutexes]) for task in GeneralVariables.task_objects]
+    mutex_values = [",".join([mutex.name for mutex in task.mutexes]) for task in GeneralVariables.task_objects]
     pos_x_values = [task.get_position()[0]+50 for task in GeneralVariables.task_objects]
     pos_y_values = [task.get_position()[1]+50 for task in GeneralVariables.task_objects]
 
