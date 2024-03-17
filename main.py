@@ -45,15 +45,13 @@ class App(customtkinter.CTk):
         filemenu.add_option(option="Exit to desktop", command=self.quit)
 
         editmenu = CustomDropdownMenu(widget=button_edit_menu, border_color="")
-        editmenu.add_option(option="Edit tasks", command=lambda: App.toggle_sidebar())
-        editmenu.add_option(option="Add new task", command=lambda: App.add_task("?"))
-        editmenu.add_option(option="Add new task 2", command=lambda: App.add_task("??"))
-        editmenu.add_separator()
-        editmenu.add_option(option="Connection mode", command=lambda: DraggableTask.switch_selection())
-        editmenu.add_option(option="Add new connection (Requires connection mode)", command=lambda: App.add_connection())
-        editmenu.add_separator()
-        editmenu.add_option(option="Mutex mode", command=lambda: print("NOT IMPLEMENTED YET"))
-        editmenu.add_option(option="Add new mutex (Requires mutex mode)", command=lambda: print("NOT IMPLEMENTED YET"))
+        editmenu.add_option(option="Edit mode", command=lambda: DraggableTask.switch_selection())
+        editmenu.add_option(option="Add new task", command=lambda: App.add_task())
+        #editmenu.add_separator()
+        #editmenu.add_option(option="Add new connection (Requires connection mode)", command=lambda: App.add_connection())
+        #editmenu.add_separator()
+        #editmenu.add_option(option="Mutex mode", command=lambda: print("NOT IMPLEMENTED YET"))
+        #editmenu.add_option(option="Add new mutex (Requires mutex mode)", command=lambda: print("NOT IMPLEMENTED YET"))
 
         runmenu = CustomDropdownMenu(widget=button_run_menu, border_color="")
         runmenu.add_option(option="Next step", command=App.step)
@@ -61,71 +59,57 @@ class App(customtkinter.CTk):
         self.create_sidebar()
 
     def create_sidebar(self):
-        App.sidebar = Frame(self, width=300, bd=0, bg="#303030")
-        App.sidebar.place(relx=0, rely=0, relheight=1, x=-300)
+        GeneralVariables.sidebar = Frame(self, width=300, bd=0, bg="#303030")
+        GeneralVariables.sidebar.place(relx=0, rely=0, relheight=1, x=-300)
 
-        task_input = StringVar()
-        activity_input = StringVar()
-        cycles_input = IntVar()
+        GeneralVariables.sidebar_task_input = StringVar()
+        GeneralVariables.sidebar_activity_input = StringVar()
+        GeneralVariables.sidebar_cycles_input = IntVar()
 
-        sidebar_title = Label(App.sidebar, text="Editor", font=("Montserrat Light", 20), bg="#2A2A2A", fg="white",
+        sidebar_title = Label(GeneralVariables.sidebar, text="Editor", font=("Montserrat Light", 20), bg="#2A2A2A", fg="white",
                               width=15)
         sidebar_title.pack(side=TOP, anchor=N, padx=0, pady=10)
 
-        task_name_frame = Frame(App.sidebar, bd=0, bg="#2A2A2A", height=30)
+        task_name_frame = Frame(GeneralVariables.sidebar, bd=0, bg="#2A2A2A", height=30)
         task_name_frame.place(relx=0, rely=0, x=15, y=100)
         task_name_title = Label(task_name_frame, text="Task name", font=("Montserrat Light", 10), bg="#2A2A2A",
                                 fg="white", width=15)
         task_name_title.pack(side=TOP, anchor=N, padx=0, pady=5)
         task_name_input = Entry(task_name_frame, font=("Montserrat Light", 10), bd=0, bg="#303030", fg="white",
-                                insertbackground="white", width=20, textvariable=task_input, borderwidth=10, relief="flat")
+                                insertbackground="white", width=20, textvariable=GeneralVariables.sidebar_task_input, borderwidth=10, relief="flat")
         task_name_input.pack(side=TOP, anchor=N, padx=15, pady=15)
 
-        activity_name_frame = Frame(App.sidebar, bd=0, bg="#2A2A2A", height=30)
+        activity_name_frame = Frame(GeneralVariables.sidebar, bd=0, bg="#2A2A2A", height=30)
         activity_name_frame.place(relx=0, rely=0, x=15, y=210)
         activity_name_title = Label(activity_name_frame, text="Activity name", font=("Montserrat Light", 10),
                                     bg="#2A2A2A",
                                     fg="white", width=15)
         activity_name_title.pack(side=TOP, anchor=N, padx=0, pady=5)
         activity_name_input = Entry(activity_name_frame, font=("Montserrat Light", 10), bd=0, bg="#303030", fg="white",
-                                    insertbackground="white", width=20, textvariable=activity_input, borderwidth=10, relief="flat")
+                                    insertbackground="white", width=20, textvariable=GeneralVariables.sidebar_activity_input, borderwidth=10, relief="flat")
         activity_name_input.pack(side=TOP, anchor=N, padx=15, pady=15)
 
-        cycles_frame = Frame(App.sidebar, bd=0, bg="#2A2A2A", height=30)
+        cycles_frame = Frame(GeneralVariables.sidebar, bd=0, bg="#2A2A2A", height=30)
         cycles_frame.place(relx=0, rely=0, x=15, y=320)
         cycles_title = Label(cycles_frame, text="Amount of cycles", font=("Montserrat Light", 10),
                                     bg="#2A2A2A",
                                     fg="white", width=15)
         cycles_title.pack(side=TOP, anchor=N, padx=0, pady=5)
         cycles_input = Entry(cycles_frame, font=("Montserrat Light", 10), bd=0, bg="#303030", fg="white",
-                                    insertbackground="white", width=20, textvariable=cycles_input, borderwidth=10,
+                                    insertbackground="white", width=20, textvariable=GeneralVariables.sidebar_cycles_input, borderwidth=10,
                                     relief="flat")
         cycles_input.pack(side=TOP, anchor=N, padx=15, pady=15)
 
         # Create a frame to simulate the button appearance
-        button_frame = Frame(App.sidebar, bg="#303030", bd=1, relief="solid",
+        button_frame = Frame(GeneralVariables.sidebar, bg="#303030", bd=1, relief="solid",
                              highlightbackground=GeneralVariables.task_color,
                              highlightthickness=1)
         button_frame.pack(side=BOTTOM, anchor=N, padx=10, pady=10)
 
         # Create a label inside the frame to display button text
         button_label = Button(button_frame, text="CONFIRM SETTINGS", fg="white", bg="#303030", bd=0,
-                              font=("Montserrat Light", 12), command=lambda: print("saving"), width=20)
+                              font=("Montserrat Light", 12), command=lambda: GeneralVariables.confirm_task_change(), width=20)
         button_label.pack()
-
-    @staticmethod
-    def toggle_sidebar():
-        import time
-        if App.sidebar.winfo_x() < 0:
-            for i in range(0, 301, 10):  # Adjust the range and step size for smoother animation
-                App.sidebar.place(relx=0, rely=0, relheight=1, x=-300 + i)
-                App.sidebar.update()  # Force update to immediately apply changes
-                time.sleep(0.001)  # Adjust sleep duration for smoother animation
-        else:
-            for i in range(0, 301, 10):  # Adjust the range and step size for smoother animation
-                App.sidebar.place(relx=0, rely=0, relheight=1, x=-i)
-                App.sidebar.update()  # Force update to immediately apply changes
-                time.sleep(0.001)  # Adjust sleep duration for smoother animation
 
     @staticmethod
     def clear_canvas():
@@ -144,13 +128,13 @@ class App(customtkinter.CTk):
             GeneralVariables.mutex_objects[mutex].update_visuals()
 
     @staticmethod
-    def add_task(name):
+    def add_task():
         print("Add task")
-        new_task = DraggableTask(name, "", GeneralVariables.root.winfo_width() / 2, GeneralVariables.root.winfo_height() / 2, 50, 1)
+        new_task = DraggableTask("?", "?", GeneralVariables.root.winfo_width() / 2, GeneralVariables.root.winfo_height() / 2, 50, 1)
         GeneralVariables.task_objects.append(new_task)
 
     @staticmethod
-    def add_connection():
+    def add_connection():  # TODO: UPDATE TO NEW EDIT SYSTEM
         print("Add connection")
         if not DraggableTask.allow_selection or DraggableTask.selectedOrigin is None or DraggableTask.selectedTarget is None:
             return
