@@ -8,6 +8,7 @@ class Mutex:
         self.connected_tasks = []
         self.lines = []
 
+        self.holder = None
         self.attendees = []
 
         self.mutex_text = GeneralVariables.canvas.create_text(0, 0, text=self.name, fill="white",
@@ -23,21 +24,38 @@ class Mutex:
         self.connected_tasks.append(task)
         self.lines.append(GeneralVariables.canvas.create_line(0, 0, 0, 0, fill=GeneralVariables.mutex_color, width=5))
 
-    def attend(self, attendee):
-        self.attendees.append(attendee)
+    def attend(self, task):
+        # Add a task to the attendees list and sort descending by priority
+        self.attendees.append(task)
+        self.attendees.sort(key=lambda x: x.priority, reverse=True)
+
+        # Check for the priority inversion
+        if self.lock and self.holder.priority < self.attendees[0].priority:
+            self.holder.elevated_priority = self.attendees[0].priority
+            print(f"Priority inheritance: {self.holder.task_name}'s priority elevated to {self.holder.elevated_priority}")
 
     def evaluate(self):
-        if self.lock or len(self.attendees) == 0:
+        if self.lock or not self.attendees:
             return
+        highest_priority_task = self.attendees.pop(0)
         self.lock = True
-        print("Mutex locked for " + self.attendees[0].task_name + self.attendees[0].activity_name)
-        self.attendees[0].grant_access()
+        self.holder = highest_priority_task
+        print("Mutex locked by " + highest_priority_task.task_name + highest_priority_task.activity_name)
+        highest_priority_task.grant_access()
 
-        self.attendees.clear()
-
-    def release(self):
+    def release(self, task):
         print("Mutex released")
+        if task != self.holder:
+            return
+
+        print("Mutex released by " + task.task_name + task.activity_name)
         self.lock = False
+        self.holder = None
+
+        # Restore original priority back if elevated
+        if hasattr(task, 'elevated_priority'):
+            task.priority = task.original_priority
+            del task.elevated_priority
 
     def update_visuals(self):
         GeneralVariables.canvas.itemconfig(self.mutex_text, text=self.name)

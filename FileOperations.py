@@ -26,6 +26,7 @@ def browse_files():
         pos_y = 50
         cycles = 1
         mutexes = []
+        priority = 0
 
         for column, cell_value in row.iloc[:8].items():  # stop after index 6
             if str(column).startswith("Unnamed: "):
@@ -47,7 +48,7 @@ def browse_files():
                     cycles = int(cell_value)
 
                 case "PRIORITY":
-                    print("Priority")
+                    priority = int(cell_value)
 
                 case "MUTEX_LIST":
                     if type(cell_value) is not float:
@@ -76,7 +77,7 @@ def browse_files():
 
         if task_name == "Undefined":
             break
-        task = DraggableTask(task_name, activity_name, pos_x, pos_y, 50, cycles)
+        task = DraggableTask(task_name, activity_name, pos_x, pos_y, 50, cycles, priority)
         if len(mutexes) > 0:
             for mutex in mutexes:
                 task.add_mutex(mutex)
