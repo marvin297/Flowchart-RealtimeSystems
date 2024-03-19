@@ -122,6 +122,19 @@ class App(customtkinter.CTk):
         GeneralVariables.sidebar_add_connection_container = Frame(GeneralVariables.sidebar, bd=0, bg="#303030")
 
         # Create a frame to simulate the button appearance
+        button_add_or_connection_frame = Frame(GeneralVariables.sidebar_add_connection_container, bg="#303030", bd=1,
+                                            relief="solid",
+                                            highlightbackground=GeneralVariables.task_color,
+                                            highlightthickness=1)
+        button_add_or_connection_frame.pack(side=BOTTOM, anchor=N, padx=10, pady=10)
+
+        # Create a label inside the frame to display button text
+        button_label = Button(button_add_or_connection_frame, text="ADD OR CONNECTION", fg="white", bg="#303030", bd=0,
+                              font=("Montserrat Light", 12), command=lambda: App.add_or_connection(),
+                              width=20)
+        button_label.pack()
+
+        # Create a frame to simulate the button appearance
         button_add_mutex_frame = Frame(GeneralVariables.sidebar_add_connection_container, bg="#303030", bd=1,
                                        relief="solid",
                                        highlightbackground=GeneralVariables.task_color,
@@ -183,16 +196,16 @@ class App(customtkinter.CTk):
     @staticmethod
     def add_task():
         print("Add task")
-        new_task = DraggableTask(
-            "?",
-            "?",
-            GeneralVariables.root.winfo_width() / 2,
-            GeneralVariables.root.winfo_height() / 2,
-            50,
-            1,
-            0
-        )
+        new_task = DraggableTask("?", "?", GeneralVariables.root.winfo_width() / 2, GeneralVariables.root.winfo_height() / 2, 50, 1, 0)
         GeneralVariables.task_objects.append(new_task)
+
+    @staticmethod
+    def add_or_connection():
+        sel_task = [task_object for task_object, position in GeneralVariables.selected_tasks.items() if str(position) == str(1)][0]
+
+        GeneralVariables.selected_connection.add_or_connection(sel_task)
+        sel_task.add_connector(GeneralVariables.selected_connection, "or")
+        sel_task.update_connections()
 
     @staticmethod
     def add_connection():  # TODO: UPDATE TO NEW EDIT SYSTEM
