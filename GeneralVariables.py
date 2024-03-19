@@ -18,6 +18,7 @@ class GeneralVariables:
     sidebar_cycles_input = None
 
     selected_tasks = {}
+    selected_connection = None
     edit_mode = False
 
     font_black = None
@@ -33,8 +34,10 @@ class GeneralVariables:
     def clear_general_variables():
         GeneralVariables.task_objects.clear()
         GeneralVariables.connector_objects.clear()
-        GeneralVariables.mutex_objects = {}
+        GeneralVariables.mutex_objects.clear()
         GeneralVariables.step_number = 0
+        GeneralVariables.selected_tasks.clear()
+        GeneralVariables.selected_connection = None
 
     @staticmethod
     def select_new_task(new_task):
@@ -79,13 +82,13 @@ class GeneralVariables:
     @staticmethod
     def _update_sidebar():
         if len(GeneralVariables.selected_tasks) > 0:
-            if len(GeneralVariables.selected_tasks) == 1:
-                GeneralVariables.sidebar_edit_task_container.pack(fill="both", expand=True)
-                GeneralVariables.sidebar_add_connection_container.pack_forget()
-                GeneralVariables.sidebar_add_mutex_container.pack_forget()
-            elif len(GeneralVariables.selected_tasks) == 2:
+            if len(GeneralVariables.selected_tasks) == 2 or GeneralVariables.selected_connection is not None:
                 GeneralVariables.sidebar_add_connection_container.pack(fill="both", expand=True)
                 GeneralVariables.sidebar_edit_task_container.pack_forget()
+                GeneralVariables.sidebar_add_mutex_container.pack_forget()
+            elif len(GeneralVariables.selected_tasks) == 1:
+                GeneralVariables.sidebar_edit_task_container.pack(fill="both", expand=True)
+                GeneralVariables.sidebar_add_connection_container.pack_forget()
                 GeneralVariables.sidebar_add_mutex_container.pack_forget()
             else:
                 GeneralVariables.sidebar_add_mutex_container.pack(fill="both", expand=True)

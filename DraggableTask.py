@@ -96,7 +96,7 @@ class DraggableTask:
         if self.task_current_cycle == self.task_max_cycles:
             print("ENDING CYCLE " + self.task_name + self.activity_name + " " + str(self.task_current_cycle) + "/" + str(self.task_max_cycles))
             for connection in self.connectors:
-                if self.connectors[connection] == "start":
+                if self.connectors[connection] == "start" or self.connectors[connection] == "or":
                     connection.increment_semaphore(GeneralVariables.step_number)  # TODO: MOVE ALL THESE VARIABLES INSIDE THE SEMAPHORE OBJECT
             self.task_current_cycle = 0
             if len(self.mutexes) > 0:
@@ -142,6 +142,16 @@ class DraggableTask:
                 end_x = self.get_position()[0] + 50
                 end_y = self.get_position()[1] + 50
                 connection.update_end(end_x, end_y)
+
+            elif self.connectors[connection] == "or":
+                connection.update_single_or_connection(self)
+
+                for or_con in connection.or_connections:
+                    line = connection.or_connections[or_con]
+                    GeneralVariables.canvas.tag_raise(self.oval, line)
+                    GeneralVariables.canvas.tag_raise(self.name_label, self.oval)
+                    GeneralVariables.canvas.tag_raise(self.activity_label, self.oval)
+                    GeneralVariables.canvas.tag_raise(self.cycle_label)
 
     def get_position(self):
         return GeneralVariables.canvas.coords(self.oval)

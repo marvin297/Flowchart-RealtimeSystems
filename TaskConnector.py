@@ -13,10 +13,14 @@ class TaskConnector:
         self.semaphore_value = semaphore_value
         self.last_change = 0
 
+        self.or_connections = {}  # TASKS THAT ALSO INCREASE THIS SEMAPHORE (OR) // STRUCTURE: {taskObject: lineObject}
+
         self.offset = offset
 
         self.semaphore_text = GeneralVariables.canvas.create_text(0, 0, text=str(semaphore_value), fill=GeneralVariables.root['bg'], font=("Montserrat Light", 12, "bold"))
         self.semaphore_bg = GeneralVariables.canvas.create_oval(0, 0, 0, 0, fill=GeneralVariables.arrow_color if not activity_connection else GeneralVariables.activity_arrow_color, outline=GeneralVariables.arrow_color if not activity_connection else GeneralVariables.activity_arrow_color)
+
+        GeneralVariables.canvas.tag_bind(self.line, "<Button-1>", lambda event: self.on_click())
 
         GeneralVariables.canvas.pack()
 
@@ -31,6 +35,15 @@ class TaskConnector:
 
         self.semaphore_value += 1
         GeneralVariables.canvas.itemconfig(self.semaphore_text, text=str(self.semaphore_value))
+
+    def on_click(self):
+        print("selected")
+        if GeneralVariables.selected_connection != self:
+            GeneralVariables.selected_connection = self
+        else:
+            GeneralVariables.selected_connection = None
+
+        GeneralVariables._update_sidebar()
 
     def update_start(self, new_x, new_y):
         x1, y1, x2, y2 = GeneralVariables.canvas.coords(self.line)
@@ -68,6 +81,8 @@ class TaskConnector:
 
         GeneralVariables.canvas.coords(self.line, x1, y1, end_x, end_y)
 
+        self.update_or_connections()
+
     def update_semaphore(self, new_x, new_y):
         x1, y1, x2, y2 = GeneralVariables.canvas.coords(self.line)
         sx1, sy1, sx2, sy2 = GeneralVariables.canvas.bbox(self.semaphore_text)
@@ -82,3 +97,24 @@ class TaskConnector:
                            (y1 + new_y) / 2 + text_width / 2 + 5)
 
         GeneralVariables.canvas.tag_raise(self.semaphore_text)
+
+        self.update_or_connections()
+
+    def add_or_connection(self, task):
+        line_object = GeneralVariables.canvas.create_line(0, 0, 0, 0, width=5, fill=GeneralVariables.arrow_color, smooth=True)
+
+        self.or_connections[task] = line_object
+
+    def update_single_or_connection(self, task):
+        x1, y1, x2, y2 = GeneralVariables.canvas.coords(self.line)
+
+        x_end = x2 + (x1 - x2) / 2
+        y_end = y2 + (y1 - y2) / 2
+
+        x1_task, y1_task, x2_task, y2_task = GeneralVariables.canvas.coords(task.oval)
+        connection_line = self.or_connections[task]
+        GeneralVariables.canvas.coords(connection_line, x1_task + 50, y1_task + 50, x_end, y_end)
+
+    def update_or_connections(self):
+        for task in self.or_connections:
+            self.update_single_or_connection(task)
