@@ -79,7 +79,7 @@ class DraggableTask:
         if amount_of_needed_connections_to_start == amount_of_ready_connections_to_start and self.task_current_cycle == 0 and amount_of_needed_connections_to_start > 0:
             if len(self.mutexes) > 0:
                 for mutex in self.mutexes:
-                    mutex.attend(attendee=self, task=self)
+                    mutex.attend(self)
             else:
                 self._start_cycle()
 
@@ -103,7 +103,7 @@ class DraggableTask:
             self.task_current_cycle = 0
             if len(self.mutexes) > 0:
                 for mutex in self.mutexes:
-                    mutex.release()
+                    mutex.release(self)
 
     def on_drag(self, event):
         if GeneralVariables.edit_mode:
