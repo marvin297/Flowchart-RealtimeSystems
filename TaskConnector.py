@@ -12,6 +12,7 @@ class TaskConnector:
         self.end_y = 0
         self.semaphore_value = semaphore_value
         self.last_change = 0
+        self.activity_connection = activity_connection
 
         self.or_connections = {}  # TASKS THAT ALSO INCREASE THIS SEMAPHORE (OR) // STRUCTURE: {taskObject: lineObject}
 
@@ -101,7 +102,9 @@ class TaskConnector:
         self.update_or_connections()
 
     def add_or_connection(self, task):
-        line_object = GeneralVariables.canvas.create_line(0, 0, 0, 0, width=5, fill=GeneralVariables.arrow_color, smooth=True)
+        line_object = GeneralVariables.canvas.create_line(0, 0, 0, 0, width=5, fill=GeneralVariables.arrow_color, smooth=True) \
+            if not self.activity_connection \
+            else GeneralVariables.canvas.create_line(0, 0, 0, 0, width=2, fill=GeneralVariables.activity_arrow_color, smooth=True)
 
         self.or_connections[task] = line_object
 

@@ -67,6 +67,7 @@ class App(customtkinter.CTk):
         App.create_edit_task_container()
         App.create_connection_container()
         App.create_mutex_container()
+        App.create_or_connection_container()
 
     @staticmethod
     def create_edit_task_container():
@@ -122,19 +123,6 @@ class App(customtkinter.CTk):
         GeneralVariables.sidebar_add_connection_container = Frame(GeneralVariables.sidebar, bd=0, bg="#303030")
 
         # Create a frame to simulate the button appearance
-        button_add_or_connection_frame = Frame(GeneralVariables.sidebar_add_connection_container, bg="#303030", bd=1,
-                                            relief="solid",
-                                            highlightbackground=GeneralVariables.task_color,
-                                            highlightthickness=1)
-        button_add_or_connection_frame.pack(side=BOTTOM, anchor=N, padx=10, pady=10)
-
-        # Create a label inside the frame to display button text
-        button_label = Button(button_add_or_connection_frame, text="ADD OR CONNECTION", fg="white", bg="#303030", bd=0,
-                              font=("Montserrat Light", 12), command=lambda: App.add_or_connection(),
-                              width=20)
-        button_label.pack()
-
-        # Create a frame to simulate the button appearance
         button_add_mutex_frame = Frame(GeneralVariables.sidebar_add_connection_container, bg="#303030", bd=1,
                                        relief="solid",
                                        highlightbackground=GeneralVariables.task_color,
@@ -174,6 +162,23 @@ class App(customtkinter.CTk):
         # Create a label inside the frame to display button text
         button_label = Button(button_add_mutex_frame, text="ADD MUTEX", fg="white", bg="#303030", bd=0,
                               font=("Montserrat Light", 12), command=lambda: print("NOT YET IMPLEMENTED"),
+                              width=20)
+        button_label.pack()
+
+    @staticmethod
+    def create_or_connection_container():
+        GeneralVariables.sidebar_add_or_connection_container = Frame(GeneralVariables.sidebar, bd=0, bg="#303030")
+
+        # Create a frame to simulate the button appearance
+        button_add_or_connection_frame = Frame(GeneralVariables.sidebar_add_or_connection_container, bg="#303030", bd=1,
+                                               relief="solid",
+                                               highlightbackground=GeneralVariables.task_color,
+                                               highlightthickness=1)
+        button_add_or_connection_frame.pack(side=BOTTOM, anchor=N, padx=10, pady=10)
+
+        # Create a label inside the frame to display button text
+        button_label = Button(button_add_or_connection_frame, text="ADD OR CONNECTION", fg="white", bg="#303030", bd=0,
+                              font=("Montserrat Light", 12), command=lambda: App.add_or_connection(),
                               width=20)
         button_label.pack()
 
