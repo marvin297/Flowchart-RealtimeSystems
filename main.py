@@ -169,7 +169,15 @@ class App(customtkinter.CTk):
     @staticmethod
     def add_task():
         print("Add task")
-        new_task = DraggableTask("?", "?", GeneralVariables.root.winfo_width() / 2, GeneralVariables.root.winfo_height() / 2, 50, 1)
+        new_task = DraggableTask(
+            "?",
+            "?",
+            GeneralVariables.root.winfo_width() / 2,
+            GeneralVariables.root.winfo_height() / 2,
+            50,
+            1,
+            0
+        )
         GeneralVariables.task_objects.append(new_task)
 
     @staticmethod

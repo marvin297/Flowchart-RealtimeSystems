@@ -20,6 +20,7 @@ class DraggableTask:
         self.mutexes = []
         self.granted_mutexes = 0
         self.priority = priority
+        self.original_priority = priority
 
         # Task cycle
         self.task_current_cycle = 0
@@ -78,7 +79,7 @@ class DraggableTask:
         if amount_of_needed_connections_to_start == amount_of_ready_connections_to_start and self.task_current_cycle == 0 and amount_of_needed_connections_to_start > 0:
             if len(self.mutexes) > 0:
                 for mutex in self.mutexes:
-                    mutex.attend(attendee=self)
+                    mutex.attend(attendee=self, self.)
             else:
                 self._start_cycle()
 
