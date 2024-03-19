@@ -212,6 +212,11 @@ class App(customtkinter.CTk):
         sel_task.add_connector(GeneralVariables.selected_connection, "or")
         sel_task.update_connections()
 
+        GeneralVariables.connector_objects.append([sel_task.task_name + sel_task.activity_name,
+                                                   GeneralVariables.selected_connection.name,
+                                                   "",
+                                                   0])
+
     @staticmethod
     def add_connection():  # TODO: UPDATE TO NEW EDIT SYSTEM
         print("Add connection")

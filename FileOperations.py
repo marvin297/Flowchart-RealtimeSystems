@@ -115,6 +115,23 @@ def browse_files():
         initial_value = semaphore[3]
         offset = semaphore[4]
 
+        if end_task_name == "Undefined":
+            needed_connector = None
+            for task in GeneralVariables.task_objects:
+                for connector in task.connectors:
+                    if connector.name == connector_name:
+                        needed_connector = connector
+                        break
+                if needed_connector is not None:
+                    break
+
+            for task in GeneralVariables.task_objects:
+                if start_task_name == task.task_name + task.activity_name:
+                    needed_connector.add_or_connection(task)
+                    task.add_connector(needed_connector, "or")
+                    task.update_connections()
+            break
+
         for j in range(len(semaphores)):
             semaphore2 = semaphores[j]
             if semaphore2[0] == end_task_name:
@@ -135,15 +152,17 @@ def browse_files():
 
         activity_connection = False
 
-        if start_task_id[0] == end_task_id[0]:
-            activity_connection = True
+        if len(end_task_id) > 0:
+            if start_task_id[0] == end_task_id[0]:
+                activity_connection = True
 
         connector = TaskConnector(connector_name, semaphore_value=initial_value, activity_connection=activity_connection, offset=offset)
         GeneralVariables.connector_objects.append([start_task_name, connector_name, end_task_name, initial_value])
 
         for task in GeneralVariables.task_objects:
             if (task.task_name + task.activity_name) == start_task_name:
-                task.add_connector(connector, "start")
+                if end_task_name != "":
+                    task.add_connector(connector, "start")
         for task in GeneralVariables.task_objects:
             if (task.task_name + task.activity_name) == end_task_name:
                 task.add_connector(connector, "end")
