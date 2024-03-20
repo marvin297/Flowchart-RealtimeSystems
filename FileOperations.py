@@ -1,7 +1,7 @@
 from tkinter import filedialog
 import pandas as pd
 from DraggableTask import DraggableTask
-from Mutex import Mutex
+from MutexPriorityInversion import MutexPriorityInversion
 from TaskConnector import TaskConnector
 from GeneralVariables import GeneralVariables
 
@@ -57,7 +57,7 @@ def browse_files():
                         for mutex_name in mutex_names:
                             if mutex_name not in GeneralVariables.mutex_objects:
                                 GeneralVariables.mutex_objects.update({
-                                    mutex_name: Mutex(mutex_name)
+                                    mutex_name: MutexPriorityInversion()
                                 })
 
                             mutexes.append(GeneralVariables.mutex_objects[mutex_name])

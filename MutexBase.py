@@ -1,9 +1,11 @@
+from abc import ABC, abstractmethod
 from GeneralVariables import GeneralVariables
 
 
-class Mutex:
-    def __init__(self, name):
-        self.name = name
+class MutexBase(ABC):
+    def __init__(self):
+        self.name = "unnamed"
+        self.algorithm_type = "No description"
         self.lock = False
         self.connected_tasks = []
         self.lines = []
@@ -12,11 +14,14 @@ class Mutex:
         self.attendees = []
 
         self.mutex_text = GeneralVariables.canvas.create_text(0, 0, text=self.name, fill="white",
-                                                 font=("Montserrat Black", 12, "bold"))
-        self.locked_text = GeneralVariables.canvas.create_text(0, 0, text=("Locked" if self.lock else "Unlocked"), fill="white",
-                                                 font=("Montserrat Light", 8, "bold"))
+                                                              font=("Montserrat Black", 12, "bold"))
+        self.locked_text = GeneralVariables.canvas.create_text(0, 0, text=("Locked" if self.lock else "Unlocked"),
+                                                               fill="white",
+                                                               font=("Montserrat Light", 8, "bold"))
 
-        self.mutex_bg = GeneralVariables.canvas.create_polygon([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], fill=GeneralVariables.mutex_color, outline=GeneralVariables.mutex_color)
+        self.mutex_bg = GeneralVariables.canvas.create_polygon([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                                               fill=GeneralVariables.mutex_color,
+                                                               outline=GeneralVariables.mutex_color)
 
         GeneralVariables.canvas.pack()
 
@@ -24,40 +29,21 @@ class Mutex:
         self.connected_tasks.append(task)
         self.lines.append(GeneralVariables.canvas.create_line(0, 0, 0, 0, fill=GeneralVariables.mutex_color, width=5))
 
+    @abstractmethod
     def attend(self, task):
-        # Add a task to the attendees list and sort descending by priority
-        self.attendees.append(task)
-        self.attendees.sort(key=lambda x: x.priority, reverse=True)
+        pass
 
-        # Check for the priority inversion
-        if self.lock and self.holder.priority < self.attendees[0].priority:
-            self.holder.elevated_priority = self.attendees[0].priority
-            print(f"Priority inheritance: {self.holder.task_name}'s priority elevated to {self.holder.elevated_priority}")
-
+    @abstractmethod
     def evaluate(self):
-        if self.lock or not self.attendees:
-            return
-        highest_priority_task = self.attendees.pop(0)
-        self.lock = True
-        self.holder = highest_priority_task
-        print("Mutex locked by " + highest_priority_task.task_name + highest_priority_task.activity_name)
-        highest_priority_task.grant_access()
+        pass
 
+    @abstractmethod
     def release(self, task):
-        print("Mutex released")
-        if task != self.holder:
-            return
-
-        print("Mutex released by " + task.task_name + task.activity_name)
-        self.lock = False
-        self.holder = None
-
-        # Restore original priority back if elevated
-        if hasattr(task, 'elevated_priority'):
-            task.priority = task.original_priority
-            del task.elevated_priority
+        pass
 
     def update_visuals(self):
+        # TODO: display current algorithm type with 'algorithm_type' variable
+
         # iterate over connected tasks name
         mutex_name = "m" + "".join([task.task_name for task in self.connected_tasks])
 
@@ -108,3 +94,4 @@ class Mutex:
 
             GeneralVariables.canvas.tag_lower(line)
             task_index += 1
+
