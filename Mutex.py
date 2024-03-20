@@ -58,7 +58,10 @@ class Mutex:
             del task.elevated_priority
 
     def update_visuals(self):
-        GeneralVariables.canvas.itemconfig(self.mutex_text, text=self.name)
+        # iterate over connected tasks name
+        mutex_name = "m" + "".join([task.task_name for task in self.connected_tasks])
+
+        GeneralVariables.canvas.itemconfig(self.mutex_text, text=mutex_name)
         GeneralVariables.canvas.itemconfig(self.locked_text, text=("Locked" if self.lock else "Unlocked"))
 
         sx1, sy1, sx2, sy2 = GeneralVariables.canvas.bbox(self.mutex_text)
