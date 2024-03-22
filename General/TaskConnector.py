@@ -13,6 +13,7 @@ class TaskConnector:
         self.semaphore_value = semaphore_value
         self.last_change = 0
         self.activity_connection = activity_connection
+        self.selected = False
 
         self.or_connections = {}  # TASKS THAT ALSO INCREASE THIS SEMAPHORE (OR) // STRUCTURE: {taskObject: lineObject}
 
@@ -40,11 +41,37 @@ class TaskConnector:
     def on_click(self):
         print("selected")
         if GeneralVariables.selected_connection != self:
+            if GeneralVariables.selected_connection is not None:
+                GeneralVariables.selected_connection.selected = False
+                GeneralVariables.selected_connection.update_visuals()
+
             GeneralVariables.selected_connection = self
+            self.selected = True
         else:
             GeneralVariables.selected_connection = None
+            self.selected = False
+
+        self.update_visuals()
 
         GeneralVariables._update_sidebar()
+
+    def update_visuals(self):
+        selected_color = None
+        reset_color = None
+
+        if self.activity_connection:
+            selected_color = GeneralVariables.activity_arrow_color_selected
+            reset_color = GeneralVariables.activity_arrow_color
+        else:
+            selected_color = GeneralVariables.arrow_color_selected
+            reset_color = GeneralVariables.arrow_color
+
+        if self.selected:
+            GeneralVariables.canvas.itemconfig(self.line, fill=selected_color)
+            GeneralVariables.canvas.itemconfig(self.semaphore_bg, fill=selected_color, outline=selected_color)
+        else:
+            GeneralVariables.canvas.itemconfig(self.line, fill=reset_color)
+            GeneralVariables.canvas.itemconfig(self.semaphore_bg, fill=reset_color, outline=reset_color)
 
     def update_start(self, new_x, new_y):
         x1, y1, x2, y2 = GeneralVariables.canvas.coords(self.line)

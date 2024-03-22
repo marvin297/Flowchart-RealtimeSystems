@@ -190,6 +190,11 @@ class DraggableTask:
             task.selected = False
 
         GeneralVariables.selected_tasks.clear()
+
+        if GeneralVariables.selected_connection is not None:
+            GeneralVariables.selected_connection.selected = False
+            GeneralVariables.selected_connection.update_visuals()
+
         GeneralVariables.selected_connection = None
 
         GeneralVariables.toggle_sidebar(show=False)

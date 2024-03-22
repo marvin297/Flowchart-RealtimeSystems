@@ -26,7 +26,9 @@ class GeneralVariables:
     font_light = None
 
     arrow_color = "#767676"
+    arrow_color_selected = "#464646"
     activity_arrow_color = "#029cff"
+    activity_arrow_color_selected = "#0065a6"
     mutex_color = "#464646"
 
     task_color = "#029cff"
