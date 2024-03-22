@@ -32,6 +32,8 @@ class GeneralVariables:
     mutex_color = "#464646"
 
     task_color = "#029cff"
+    task_color_selected = "#00335c"
+    task_color_running = "red"
 
     @staticmethod
     def clear_general_variables():

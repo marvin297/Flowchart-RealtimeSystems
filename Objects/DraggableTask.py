@@ -75,6 +75,8 @@ class DraggableTask:
         self.update_status_text()
         self.granted_mutexes = 0
 
+        GeneralVariables.canvas.itemconfig(self.oval, outline=GeneralVariables.task_color_running)
+
     def attend(self, amount_of_needed_connections_to_start, amount_of_ready_connections_to_start):
         if amount_of_needed_connections_to_start == amount_of_ready_connections_to_start and self.task_current_cycle == 0 and amount_of_needed_connections_to_start > 0:
             if len(self.mutexes) > 0:
@@ -104,6 +106,8 @@ class DraggableTask:
             if len(self.mutexes) > 0:
                 for mutex in self.mutexes:
                     mutex.release(self)
+
+            GeneralVariables.canvas.itemconfig(self.oval, outline=GeneralVariables.task_color)
 
     def on_drag(self, event):
         if GeneralVariables.edit_mode:
@@ -173,10 +177,14 @@ class DraggableTask:
         if self.selected:
             selection_number = GeneralVariables.select_new_task(self)
             GeneralVariables.canvas.itemconfig(self.selection_text, text=str(selection_number))
-            GeneralVariables.canvas.itemconfig(self.oval, outline="#00335c")
+            GeneralVariables.canvas.itemconfig(self.oval, outline=GeneralVariables.task_color_selected)
         else:
             GeneralVariables.canvas.itemconfig(self.selection_text, text="")
-            GeneralVariables.canvas.itemconfig(self.oval, outline=GeneralVariables.task_color)
+            if self.task_current_cycle > 0:
+                GeneralVariables.canvas.itemconfig(self.oval, outline=GeneralVariables.task_color_running)
+            else:
+
+                GeneralVariables.canvas.itemconfig(self.oval, outline=GeneralVariables.task_color)
             GeneralVariables.remove_selected_task(self)
 
     @staticmethod
