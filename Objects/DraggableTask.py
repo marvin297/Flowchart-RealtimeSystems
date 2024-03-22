@@ -1,4 +1,4 @@
-from GeneralVariables import GeneralVariables
+from General.GeneralVariables import GeneralVariables
 
 
 class DraggableTask:
@@ -190,5 +190,6 @@ class DraggableTask:
             task.selected = False
 
         GeneralVariables.selected_tasks.clear()
+        GeneralVariables.selected_connection = None
 
         GeneralVariables.toggle_sidebar(show=False)

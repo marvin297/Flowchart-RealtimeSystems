@@ -1,10 +1,10 @@
 from tkinter import *
 import customtkinter
-from FileOperations import browse_files, save_file
-from DraggableTask import DraggableTask
+from Objects.FileOperations import browse_files, save_file
+from Objects.DraggableTask import DraggableTask
 from CTkMenuBar import *
-from GeneralVariables import GeneralVariables
-from TaskConnector import TaskConnector
+from General.GeneralVariables import GeneralVariables
+from General.TaskConnector import TaskConnector
 
 
 class App(customtkinter.CTk):

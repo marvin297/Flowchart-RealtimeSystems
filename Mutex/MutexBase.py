@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from GeneralVariables import GeneralVariables
+from General.GeneralVariables import GeneralVariables
 
 
 class MutexBase(ABC):

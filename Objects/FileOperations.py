@@ -1,9 +1,9 @@
 from tkinter import filedialog
 import pandas as pd
-from DraggableTask import DraggableTask
-from MutexPriorityInversion import MutexPriorityInversion
-from TaskConnector import TaskConnector
-from GeneralVariables import GeneralVariables
+from Objects.DraggableTask import DraggableTask
+from Mutex.MutexPriorityInversion import MutexPriorityInversion
+from General.TaskConnector import TaskConnector
+from General.GeneralVariables import GeneralVariables
 
 
 def browse_files():

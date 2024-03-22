@@ -1,4 +1,4 @@
-from MutexBase import MutexBase
+from Mutex.MutexBase import MutexBase
 
 
 class MutexPriorityInversion(MutexBase):

@@ -1,4 +1,4 @@
-from GeneralVariables import GeneralVariables
+from General.GeneralVariables import GeneralVariables
 
 
 class TaskConnector:
