@@ -18,6 +18,8 @@ class GeneralVariables:
     sidebar_activity_input = None
     sidebar_cycles_input = None
 
+    simulation_sidebar = None
+
     selected_tasks = {}
     selected_connection = None
     edit_mode = False
@@ -34,6 +36,8 @@ class GeneralVariables:
     task_color = "#029cff"
     task_color_selected = "#00335c"
     task_color_running = "red"
+
+    last_import_file_path = ""
 
     @staticmethod
     def clear_general_variables():

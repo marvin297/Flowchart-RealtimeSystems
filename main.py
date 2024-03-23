@@ -1,6 +1,7 @@
 from tkinter import *
 import customtkinter
-from Objects.FileOperations import browse_files, save_file
+from customtkinter import CTkSlider, CTkButton
+from Objects.FileOperations import load_files, save_file
 from Objects.DraggableTask import DraggableTask
 from CTkMenuBar import *
 from General.GeneralVariables import GeneralVariables
@@ -9,6 +10,7 @@ from General.TaskConnector import TaskConnector
 
 class App(customtkinter.CTk):
     sidebar = None
+    running = False
 
     def __init__(self):
         super().__init__()
@@ -39,7 +41,8 @@ class App(customtkinter.CTk):
 
         filemenu = CustomDropdownMenu(widget=button_file_menu, border_color="")
         filemenu.add_option(option="Save as xslx", command=lambda: save_file())
-        filemenu.add_option(option="Load from xslx", command=lambda: browse_files())
+        filemenu.add_option(option="Load from xslx", command=lambda: load_files(show_file_dialog=True) or self.stop_simulation())
+        filemenu.add_option(option="Reload file", command=lambda: load_files(show_file_dialog=False) or self.stop_simulation())
         filemenu.add_separator()
         filemenu.add_option(option="Clear chart", command=lambda: App.clear_canvas())
         filemenu.add_option(option="Exit to desktop", command=self.quit)
@@ -51,7 +54,48 @@ class App(customtkinter.CTk):
         runmenu = CustomDropdownMenu(widget=button_run_menu, border_color="")
         runmenu.add_option(option="Next step", command=App.step)
 
+        self.speed_slider = CTkSlider(self, from_=0, to=3, number_of_steps=500)
+        self.speed_slider.pack(side='top', fill='x', padx=10, pady=10)  # Adjust the placement as needed
+        self.speed_slider.set(1)  # Set default speed value
+        self.speed_slider.configure(command=self.updateSimulationSpeed)
+
+        # Add start and stop buttons
+        self.start_button = CTkButton(self, text="Start Simulation", command=self.start_simulation)
+        self.start_button.pack(side='top', padx=10, pady=5)
+
+        self.stop_button = CTkButton(self, text="Stop Simulation", command=self.stop_simulation)
+        self.stop_button.pack(side='top', padx=10, pady=5)
+
         self.create_sidebar()
+        self.create_run_sidebar()
+
+    def updateSimulationSpeed(self, value):
+        # Convert slider value to a delay (in milliseconds)
+        self.current_delay = int((float(value)) * 1000 + 1)
+        print(f"Speed set to {value}, delay {self.current_delay} ms")
+
+    def start_simulation(self):
+        if not self.running:
+            self.updateSimulationSpeed(value=1)
+            self.running = True
+            self.run_periodically()
+
+    def stop_simulation(self):
+        self.running = False
+
+    def run_periodically(self):
+        if self.running:
+            self.step()
+            # Schedule the next call
+            self.after(self.current_delay, self.run_periodically)
+
+    def create_run_sidebar(self):
+        GeneralVariables.simulation_sidebar = Frame(self, width=300, bd=0, bg="#303030", height=300)
+        GeneralVariables.simulation_sidebar.place(relx=0, rely=0, relheight=1)
+        sidebar_title = Label(GeneralVariables.simulation_sidebar, text="Simulation", font=("Montserrat Light", 20), bg="#2A2A2A", fg="white", width=15)
+        sidebar_title.pack(side=TOP, anchor=N, padx=0, pady=10)
+
+
 
     def create_sidebar(self):
         GeneralVariables.sidebar = Frame(self, width=300, bd=0, bg="#303030")

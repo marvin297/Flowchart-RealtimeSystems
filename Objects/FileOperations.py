@@ -6,15 +6,17 @@ from General.TaskConnector import TaskConnector
 from General.GeneralVariables import GeneralVariables
 
 
-def browse_files():
-    filename = filedialog.askopenfilename(title="Select a File", filetypes=(("Excel :)", "*.xlsx"), ("all files", "*.*")))
-    if filename == "":
+def load_files(show_file_dialog=False):
+    if show_file_dialog:
+        GeneralVariables.last_import_file_path = filedialog.askopenfilename(title="Select a File", filetypes=(("Excel :)", "*.xlsx"), ("all files", "*.*")))
+
+    if GeneralVariables.last_import_file_path == "":
         return
 
     import math
 
     # read by default 1st sheet of an excel file
-    table_of_content = pd.read_excel(filename)
+    table_of_content = pd.read_excel(GeneralVariables.last_import_file_path)
 
     GeneralVariables.clear_general_variables()
     GeneralVariables.canvas.delete("all")
