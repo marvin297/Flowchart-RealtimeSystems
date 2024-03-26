@@ -69,10 +69,12 @@ class App(customtkinter.CTk):
             self.show_sim_sidebar = True
             GeneralVariables.simulation_sidebar.place(relx=0, rely=0, relheight=1, x=0)
 
+    current_delay = 1000
     def updateSimulationSpeed(self, value):
         # Convert slider value to a delay (in milliseconds)
-        self.current_delay = int((float(value)) * 1000 + 1)
+        self.current_delay = int(3000 - value)
         print(f"Speed set to {value}, delay {self.current_delay} ms")
+        self.update_speed_value()
 
     def start_simulation(self):
         if not self.running:
@@ -101,10 +103,16 @@ class App(customtkinter.CTk):
         sim_end_button = customtkinter.CTkButton(GeneralVariables.simulation_sidebar, text="Stop", command=self.stop_simulation)
         sim_end_button.pack(pady=10, padx=10)
 
-        self.speed_slider = customtkinter.CTkSlider(GeneralVariables.simulation_sidebar, from_=0, to=3, number_of_steps=500)
-        self.speed_slider.pack(side=customtkinter.TOP, fill=customtkinter.X, padx=10, pady=10)
-        self.speed_slider.set(1)  # Set default speed value
-        self.speed_slider.configure(command=self.updateSimulationSpeed)
+        speed_slider = customtkinter.CTkSlider(GeneralVariables.simulation_sidebar, from_=1, to=3000, number_of_steps=3000)
+        speed_slider.pack(side=customtkinter.TOP, fill=customtkinter.X, padx=10, pady=10)
+        speed_slider.set(1000)  # Set default speed value
+        speed_slider.configure(command=self.updateSimulationSpeed)
+
+        self.dynamic_value_label = customtkinter.CTkLabel(GeneralVariables.simulation_sidebar, text="Period per Cycle: 1000ms", bg_color="#FFFFFF", fg_color="#303030")
+        self.dynamic_value_label.pack(pady=10)
+
+    def update_speed_value(self):
+        self.dynamic_value_label.configure(text=f"Period per Cycle: {self.current_delay}ms")
 
     def create_sidebar(self):
         GeneralVariables.sidebar = Frame(self, width=300, bd=0, bg="#303030")
