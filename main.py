@@ -10,6 +10,7 @@ from General.TaskConnector import TaskConnector
 
 class App(customtkinter.CTk):
     sidebar = None
+    show_sim_sidebar = False
     running = False
 
     def __init__(self):
@@ -53,9 +54,20 @@ class App(customtkinter.CTk):
 
         runmenu = CustomDropdownMenu(widget=button_run_menu, border_color="")
         runmenu.add_option(option="Next step", command=App.step)
+        runmenu.add_option(option="Hide/Show Simulation Sidebar", command=self.toggleSimulationSidebar)
 
         self.create_sidebar()
         self.create_run_sidebar()
+
+    def toggleSimulationSidebar(self):
+        if self.show_sim_sidebar:
+            self.show_sim_sidebar = False
+            GeneralVariables.simulation_sidebar.place(relx=0, rely=0, relheight=1, x=-300)
+            print(f"------------hidden")
+        else:
+            print(f"------------shown")
+            self.show_sim_sidebar = True
+            GeneralVariables.simulation_sidebar.place(relx=0, rely=0, relheight=1, x=0)
 
     def updateSimulationSpeed(self, value):
         # Convert slider value to a delay (in milliseconds)
@@ -79,7 +91,7 @@ class App(customtkinter.CTk):
 
     def create_run_sidebar(self):
         GeneralVariables.simulation_sidebar = Frame(self, width=300, bd=0, bg="#303030", height=300)
-        GeneralVariables.simulation_sidebar.place(relx=0, rely=0, relheight=1)
+        GeneralVariables.simulation_sidebar.place(relx=0, rely=0, relheight=1, x=-300)
         sidebar_title = Label(GeneralVariables.simulation_sidebar, text="Simulation", font=("Montserrat Light", 20), bg="#2A2A2A", fg="white", width=15)
         sidebar_title.pack(side=TOP, anchor=N, padx=0, pady=10)
 
