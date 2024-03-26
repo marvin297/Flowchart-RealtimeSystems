@@ -72,7 +72,7 @@ class App(customtkinter.CTk):
     current_delay = 1000
     def updateSimulationSpeed(self, value):
         # Convert slider value to a delay (in milliseconds)
-        self.current_delay = int(3000 - value)
+        self.current_delay = int(3000 + 1 - value)
         print(f"Speed set to {value}, delay {self.current_delay} ms")
         self.update_speed_value()
 
