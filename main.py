@@ -1,6 +1,6 @@
 from tkinter import *
 import customtkinter
-from customtkinter import CTkSlider, CTkButton
+from customtkinter import CTkSlider, CTkButton, CTk
 from Objects.FileOperations import load_files, save_file
 from Objects.DraggableTask import DraggableTask
 from CTkMenuBar import *
@@ -54,18 +54,6 @@ class App(customtkinter.CTk):
         runmenu = CustomDropdownMenu(widget=button_run_menu, border_color="")
         runmenu.add_option(option="Next step", command=App.step)
 
-        self.speed_slider = CTkSlider(self, from_=0, to=3, number_of_steps=500)
-        self.speed_slider.pack(side='top', fill='x', padx=10, pady=10)  # Adjust the placement as needed
-        self.speed_slider.set(1)  # Set default speed value
-        self.speed_slider.configure(command=self.updateSimulationSpeed)
-
-        # Add start and stop buttons
-        self.start_button = CTkButton(self, text="Start Simulation", command=self.start_simulation)
-        self.start_button.pack(side='top', padx=10, pady=5)
-
-        self.stop_button = CTkButton(self, text="Stop Simulation", command=self.stop_simulation)
-        self.stop_button.pack(side='top', padx=10, pady=5)
-
         self.create_sidebar()
         self.create_run_sidebar()
 
@@ -95,7 +83,16 @@ class App(customtkinter.CTk):
         sidebar_title = Label(GeneralVariables.simulation_sidebar, text="Simulation", font=("Montserrat Light", 20), bg="#2A2A2A", fg="white", width=15)
         sidebar_title.pack(side=TOP, anchor=N, padx=0, pady=10)
 
+        sim_start_button = customtkinter.CTkButton(GeneralVariables.simulation_sidebar, text="Start", command=self.start_simulation)
+        sim_start_button.pack(pady=10, padx=10)
 
+        sim_end_button = customtkinter.CTkButton(GeneralVariables.simulation_sidebar, text="Stop", command=self.stop_simulation)
+        sim_end_button.pack(pady=10, padx=10)
+
+        self.speed_slider = customtkinter.CTkSlider(GeneralVariables.simulation_sidebar, from_=0, to=3, number_of_steps=500)
+        self.speed_slider.pack(side=customtkinter.TOP, fill=customtkinter.X, padx=10, pady=10)
+        self.speed_slider.set(1)  # Set default speed value
+        self.speed_slider.configure(command=self.updateSimulationSpeed)
 
     def create_sidebar(self):
         GeneralVariables.sidebar = Frame(self, width=300, bd=0, bg="#303030")
