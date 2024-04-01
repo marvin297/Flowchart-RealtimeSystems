@@ -26,6 +26,14 @@ class TaskConnector:
 
         GeneralVariables.canvas.pack()
 
+    def delete(self):
+        GeneralVariables.canvas.delete(self.line)
+        GeneralVariables.canvas.delete(self.semaphore_text)
+        GeneralVariables.canvas.delete(self.semaphore_bg)
+
+        for task in self.or_connections:
+            GeneralVariables.canvas.delete(self.or_connections[task])
+
     def decrement_semaphore(self, change_time):
         self.last_change = change_time
 

@@ -1,6 +1,3 @@
-from tkinter import StringVar, IntVar
-
-
 class GeneralVariables:
     task_objects = []
     connector_objects = []

@@ -2,7 +2,7 @@ from tkinter import filedialog
 import pandas as pd
 from Objects.DraggableTask import DraggableTask
 from Mutex.MutexPriorityInversion import MutexPriorityInversion
-from General.TaskConnector import TaskConnector
+from Objects.TaskConnector import TaskConnector
 from General.GeneralVariables import GeneralVariables
 
 

@@ -1,11 +1,10 @@
 from tkinter import *
 import customtkinter
-from customtkinter import CTkSlider, CTkButton, CTk
 from Objects.FileOperations import load_files, save_file
 from Objects.DraggableTask import DraggableTask
 from CTkMenuBar import *
 from General.GeneralVariables import GeneralVariables
-from General.TaskConnector import TaskConnector
+from Objects.TaskConnector import TaskConnector
 
 
 class App(customtkinter.CTk):
@@ -51,15 +50,41 @@ class App(customtkinter.CTk):
         editmenu = CustomDropdownMenu(widget=button_edit_menu, border_color="")
         editmenu.add_option(option="Edit mode", command=lambda: DraggableTask.switch_selection())
         editmenu.add_option(option="Add new task", command=lambda: App.add_task())
+        editmenu.add_option(option="Delete selected task", command=lambda: self.delete_selection())
 
         runmenu = CustomDropdownMenu(widget=button_run_menu, border_color="")
         runmenu.add_option(option="Next step", command=App.step)
-        runmenu.add_option(option="Hide/Show Simulation Sidebar", command=self.toggleSimulationSidebar)
+        runmenu.add_option(option="Hide/Show Simulation Sidebar", command=self.toggle_simulation_sidebar)
 
         self.create_sidebar()
         self.create_run_sidebar()
 
-    def toggleSimulationSidebar(self):
+    def delete_selection(self):
+        for task in GeneralVariables.selected_tasks:
+            con_cpy = task.connectors.copy()
+            for connector in con_cpy:
+                for task2 in GeneralVariables.task_objects:
+                    if connector in task2.connectors:
+                        task2.connectors.pop(connector)
+                        task2.update_connections()
+                        connector.delete()
+
+            to_del_cons = []
+            for con_obj in GeneralVariables.connector_objects:
+                if task.task_name + task.activity_name in con_obj:
+                    to_del_cons.append(con_obj)
+
+            for con_obj in to_del_cons:
+                GeneralVariables.connector_objects.remove(con_obj)
+
+            GeneralVariables.task_objects.remove(task)
+            task.delete()
+
+        GeneralVariables.selected_tasks.clear()
+
+
+
+    def toggle_simulation_sidebar(self):
         if self.show_sim_sidebar:
             self.show_sim_sidebar = False
             GeneralVariables.simulation_sidebar.place(relx=0, rely=0, relheight=1, x=-300)
@@ -70,7 +95,8 @@ class App(customtkinter.CTk):
             GeneralVariables.simulation_sidebar.place(relx=0, rely=0, relheight=1, x=0)
 
     current_delay = 1000
-    def updateSimulationSpeed(self, value):
+
+    def update_simulation_speed(self, value):
         # Convert slider value to a delay (in milliseconds)
         self.current_delay = int(3000 + 1 - value)
         print(f"Speed set to {value}, delay {self.current_delay} ms")
@@ -78,7 +104,7 @@ class App(customtkinter.CTk):
 
     def start_simulation(self):
         if not self.running:
-            self.updateSimulationSpeed(value=1)
+            self.update_simulation_speed(value=1)
             self.running = True
             self.run_periodically()
 
@@ -106,7 +132,7 @@ class App(customtkinter.CTk):
         speed_slider = customtkinter.CTkSlider(GeneralVariables.simulation_sidebar, from_=1, to=3000, number_of_steps=3000)
         speed_slider.pack(side=customtkinter.TOP, fill=customtkinter.X, padx=10, pady=10)
         speed_slider.set(1000)  # Set default speed value
-        speed_slider.configure(command=self.updateSimulationSpeed)
+        speed_slider.configure(command=self.update_simulation_speed)
 
         self.dynamic_value_label = customtkinter.CTkLabel(GeneralVariables.simulation_sidebar, text="Period per Cycle: 1000ms", bg_color="#FFFFFF", fg_color="#303030")
         self.dynamic_value_label.pack(pady=10)
@@ -279,7 +305,7 @@ class App(customtkinter.CTk):
                                                    0])
 
     @staticmethod
-    def add_connection():  # TODO: UPDATE TO NEW EDIT SYSTEM
+    def add_connection():
         print("Add connection")
         origin_task = [task_object for task_object, position in GeneralVariables.selected_tasks.items() if str(position) == str(1)][0]
         target_task = [task_object for task_object, position in GeneralVariables.selected_tasks.items() if str(position) == str(2)][0]

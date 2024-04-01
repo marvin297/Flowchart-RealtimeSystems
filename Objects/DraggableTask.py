@@ -46,6 +46,18 @@ class DraggableTask:
 
         GeneralVariables.canvas.pack()
 
+    def delete(self):
+        GeneralVariables.canvas.delete(self.oval)
+        GeneralVariables.canvas.delete(self.name_label)
+        GeneralVariables.canvas.delete(self.activity_label)
+        GeneralVariables.canvas.delete(self.cycle_label)
+        GeneralVariables.canvas.delete(self.selection_text)
+
+        for connector in self.connectors:
+            connector.delete()
+
+        print("DELETING TASK")
+
     def try_step(self):
         #  If the task is not in the middle of a cycle, then it can start a new cycle
         if self.task_max_cycles > self.task_current_cycle > 0:
@@ -101,7 +113,7 @@ class DraggableTask:
             print("ENDING CYCLE " + self.task_name + self.activity_name + " " + str(self.task_current_cycle) + "/" + str(self.task_max_cycles))
             for connection in self.connectors:
                 if self.connectors[connection] == "start" or self.connectors[connection] == "or":
-                    connection.increment_semaphore(GeneralVariables.step_number)  # TODO: MOVE ALL THESE VARIABLES INSIDE THE SEMAPHORE OBJECT
+                    connection.increment_semaphore(GeneralVariables.step_number)
             self.task_current_cycle = 0
             if len(self.mutexes) > 0:
                 for mutex in self.mutexes:
