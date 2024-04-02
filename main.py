@@ -1,13 +1,41 @@
+# -*- coding: utf-8 -*-
+"""
+A graphical user interface (GUI) application for creating, editing, and simulating flowcharts.
+
+The application allows users to:
+- Create and edit tasks with customizable names, activities, and cycle counts
+- Connect tasks using connectors and OR connections
+- Simulate the execution of the flowchart with adjustable speed
+- Save and load flowcharts from XLSX files
+- Clear the canvas and delete selected tasks
+
+The main class `App` sets up the GUI window, menus, sidebars, and canvas using the Tkinter and customtkinter libraries.
+The `DraggableTask` class represents a task in the flowchart, which can be dragged and edited on the canvas.
+The `TaskConnector` class represents a connection between tasks in the flowchart.
+The `Configuration` class holds general variables and objects used throughout the application.
+
+Additional features include:
+- Editing task properties in the sidebar
+- Adding mutexes and OR connections between tasks
+- Controlling the simulation speed with a slider
+- Showing/hiding the simulation sidebar
+
+This module provides a comprehensive GUI for creating, editing, and simulating flowcharts with various features
+for task management, connections, mutexes, and simulation control.
+"""
+
+# Import necessary modules
 from tkinter import *
 import customtkinter
 from Objects.FileOperations import load_files, save_file
 from Objects.DraggableTask import DraggableTask
 from CTkMenuBar import *
-from General.GeneralVariables import GeneralVariables
+from General.Configuration import Configuration
 from Objects.TaskConnector import TaskConnector
 
 
 class App(customtkinter.CTk):
+    """Main application class."""
     sidebar = None
     show_sim_sidebar = False
     running = False
@@ -15,30 +43,32 @@ class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
 
-        GeneralVariables.root = self
+        Configuration.root = self
 
         customtkinter.set_appearance_mode("system")
         customtkinter.set_default_color_theme("blue")
         self.geometry("800x800")
 
-        # configure window
+        # Configure window
         self.title("Flowchart Editor")
 
-        # fonts
+        # Load custom fonts
         from tkextrafont import Font
-        GeneralVariables.font_black = Font(file="fonts/Montserrat-Black.ttf", family="Montserrat")
-        GeneralVariables.font_light_normal = Font(file="fonts/Montserrat-Light.ttf", family="Montserrat")
+        Configuration.font_black = Font(file="fonts/Montserrat-Black.ttf", family="Montserrat")
+        Configuration.font_light_normal = Font(file="fonts/Montserrat-Light.ttf", family="Montserrat")
 
         # Create a canvas object
         canvas = Canvas(self, bd=0, highlightthickness=0, background=self['bg'])
         canvas.pack(fill=BOTH, expand=True)
-        GeneralVariables.canvas = canvas
+        Configuration.canvas = canvas
 
+        # Create menu bar
         menubar = CTkTitleMenu(master=self)
         button_file_menu = menubar.add_cascade("File")
         button_edit_menu = menubar.add_cascade("Edit")
         button_run_menu = menubar.add_cascade("Run")
 
+        # Create file menu
         filemenu = CustomDropdownMenu(widget=button_file_menu, border_color="")
         filemenu.add_option(option="Save as xslx", command=lambda: save_file())
         filemenu.add_option(option="Load from xslx", command=lambda: load_files(show_file_dialog=True) or self.stop_simulation())
@@ -47,108 +77,94 @@ class App(customtkinter.CTk):
         filemenu.add_option(option="Clear chart", command=lambda: App.clear_canvas())
         filemenu.add_option(option="Exit to desktop", command=self.quit)
 
+        # Create edit menu
         editmenu = CustomDropdownMenu(widget=button_edit_menu, border_color="")
         editmenu.add_option(option="Edit mode", command=lambda: DraggableTask.switch_selection())
         editmenu.add_option(option="Add new task", command=lambda: App.add_task())
-        editmenu.add_option(option="Delete selected task", command=lambda: self.delete_selection())
+        editmenu.add_option(option="Delete selected task", command=lambda: Configuration.delete_selection())
 
+        # Create run menu
         runmenu = CustomDropdownMenu(widget=button_run_menu, border_color="")
         runmenu.add_option(option="Next step", command=App.step)
         runmenu.add_option(option="Hide/Show Simulation Sidebar", command=self.toggle_simulation_sidebar)
 
+        # Create sidebars
         self.create_sidebar()
         self.create_run_sidebar()
 
-    def delete_selection(self):
-        for task in GeneralVariables.selected_tasks:
-            con_cpy = task.connectors.copy()
-            for connector in con_cpy:
-                for task2 in GeneralVariables.task_objects:
-                    if connector in task2.connectors:
-                        task2.connectors.pop(connector)
-                        task2.update_connections()
-                        connector.delete()
-
-            to_del_cons = []
-            for con_obj in GeneralVariables.connector_objects:
-                if task.task_name + task.activity_name in con_obj:
-                    to_del_cons.append(con_obj)
-
-            for con_obj in to_del_cons:
-                GeneralVariables.connector_objects.remove(con_obj)
-
-            GeneralVariables.task_objects.remove(task)
-            task.delete()
-
-        GeneralVariables.selected_tasks.clear()
-
-
-
     def toggle_simulation_sidebar(self):
+        """Toggle visibility of the simulation sidebar."""
         if self.show_sim_sidebar:
             self.show_sim_sidebar = False
-            GeneralVariables.simulation_sidebar.place(relx=0, rely=0, relheight=1, x=-300)
+            Configuration.simulation_sidebar.place(relx=0, rely=0, relheight=1, x=-300)
             print(f"------------hidden")
         else:
             print(f"------------shown")
             self.show_sim_sidebar = True
-            GeneralVariables.simulation_sidebar.place(relx=0, rely=0, relheight=1, x=0)
+            Configuration.simulation_sidebar.place(relx=0, rely=0, relheight=1, x=0)
 
     current_delay = 1000
 
     def update_simulation_speed(self, value):
+        """Update the simulation speed based on the slider value."""
         # Convert slider value to a delay (in milliseconds)
         self.current_delay = int(3000 + 1 - value)
         print(f"Speed set to {value}, delay {self.current_delay} ms")
         self.update_speed_value()
 
     def start_simulation(self):
+        """Start the simulation."""
         if not self.running:
             self.update_simulation_speed(value=1)
             self.running = True
             self.run_periodically()
 
     def stop_simulation(self):
+        """Stop the simulation."""
         self.running = False
 
     def run_periodically(self):
+        """Run the simulation periodically based on the current delay."""
         if self.running:
             self.step()
             # Schedule the next call
             self.after(self.current_delay, self.run_periodically)
 
     def create_run_sidebar(self):
-        GeneralVariables.simulation_sidebar = Frame(self, width=300, bd=0, bg="#303030", height=300)
-        GeneralVariables.simulation_sidebar.place(relx=0, rely=0, relheight=1, x=-300)
-        sidebar_title = Label(GeneralVariables.simulation_sidebar, text="Simulation", font=("Montserrat Light", 20), bg="#2A2A2A", fg="white", width=15)
+        """Create the simulation sidebar."""
+        Configuration.simulation_sidebar = Frame(self, width=300, bd=0, bg="#303030", height=300)
+        Configuration.simulation_sidebar.place(relx=0, rely=0, relheight=1, x=-300)
+        sidebar_title = Label(Configuration.simulation_sidebar, text="Simulation", font=("Montserrat Light", 20), bg="#2A2A2A", fg="white", width=15)
         sidebar_title.pack(side=TOP, anchor=N, padx=0, pady=10)
 
-        sim_start_button = customtkinter.CTkButton(GeneralVariables.simulation_sidebar, text="Start", command=self.start_simulation)
+        sim_start_button = customtkinter.CTkButton(Configuration.simulation_sidebar, text="Start", command=self.start_simulation)
         sim_start_button.pack(pady=10, padx=10)
 
-        sim_end_button = customtkinter.CTkButton(GeneralVariables.simulation_sidebar, text="Stop", command=self.stop_simulation)
+        sim_end_button = customtkinter.CTkButton(Configuration.simulation_sidebar, text="Stop", command=self.stop_simulation)
         sim_end_button.pack(pady=10, padx=10)
 
-        speed_slider = customtkinter.CTkSlider(GeneralVariables.simulation_sidebar, from_=1, to=3000, number_of_steps=3000)
+        speed_slider = customtkinter.CTkSlider(Configuration.simulation_sidebar, from_=1, to=3000, number_of_steps=3000)
         speed_slider.pack(side=customtkinter.TOP, fill=customtkinter.X, padx=10, pady=10)
         speed_slider.set(1000)  # Set default speed value
         speed_slider.configure(command=self.update_simulation_speed)
 
-        self.dynamic_value_label = customtkinter.CTkLabel(GeneralVariables.simulation_sidebar, text="Period per Cycle: 1000ms", bg_color="#FFFFFF", fg_color="#303030")
+        self.dynamic_value_label = customtkinter.CTkLabel(Configuration.simulation_sidebar, text="Period per Cycle: 1000ms", bg_color=self['bg'], fg_color="#303030")
         self.dynamic_value_label.pack(pady=10)
 
     def update_speed_value(self):
+        """Update the displayed speed value."""
         self.dynamic_value_label.configure(text=f"Period per Cycle: {self.current_delay}ms")
 
     def create_sidebar(self):
-        GeneralVariables.sidebar = Frame(self, width=300, bd=0, bg="#303030")
-        GeneralVariables.sidebar.place(relx=0, rely=0, relheight=1, x=-300)
+        """Create the main sidebar."""
+        Configuration.sidebar = Frame(self, width=300, bd=0, bg="#303030")
+        Configuration.sidebar.place(relx=0, rely=0, relheight=1, x=-300)
 
-        GeneralVariables.sidebar_task_input = StringVar()
-        GeneralVariables.sidebar_activity_input = StringVar()
-        GeneralVariables.sidebar_cycles_input = IntVar()
+        Configuration.sidebar_task_input = StringVar()
+        Configuration.sidebar_activity_input = StringVar()
+        Configuration.sidebar_cycles_input = IntVar()
 
-        sidebar_title = Label(GeneralVariables.sidebar, text="Editor", font=("Montserrat Light", 20), bg="#2A2A2A", fg="white",
+        sidebar_title = Label(Configuration.sidebar, text="Editor", font=("Montserrat Light", 20), bg="#2A2A2A", fg="white",
                               width=15)
         sidebar_title.pack(side=TOP, anchor=N, padx=0, pady=10)
         App.create_edit_task_container()
@@ -158,19 +174,20 @@ class App(customtkinter.CTk):
 
     @staticmethod
     def create_edit_task_container():
-        GeneralVariables.sidebar_edit_task_container = Frame(GeneralVariables.sidebar, bd=0, bg="#303030")
+        """Create the edit task container in the sidebar."""
+        Configuration.sidebar_edit_task_container = Frame(Configuration.sidebar, bd=0, bg="#303030")
 
-        task_name_frame = Frame(GeneralVariables.sidebar_edit_task_container, bd=0, bg="#2A2A2A", height=30)
+        task_name_frame = Frame(Configuration.sidebar_edit_task_container, bd=0, bg="#2A2A2A", height=30)
         task_name_frame.place(relx=0, rely=0, x=15, y=100)
         task_name_title = Label(task_name_frame, text="Task name", font=("Montserrat Light", 10), bg="#2A2A2A",
                                 fg="white", width=15)
         task_name_title.pack(side=TOP, anchor=N, padx=0, pady=5)
         task_name_input = Entry(task_name_frame, font=("Montserrat Light", 10), bd=0, bg="#303030", fg="white",
-                                insertbackground="white", width=20, textvariable=GeneralVariables.sidebar_task_input,
+                                insertbackground="white", width=20, textvariable=Configuration.sidebar_task_input,
                                 borderwidth=10, relief="flat")
         task_name_input.pack(side=TOP, anchor=N, padx=15, pady=15)
 
-        activity_name_frame = Frame(GeneralVariables.sidebar_edit_task_container, bd=0, bg="#2A2A2A", height=30)
+        activity_name_frame = Frame(Configuration.sidebar_edit_task_container, bd=0, bg="#2A2A2A", height=30)
         activity_name_frame.place(relx=0, rely=0, x=15, y=210)
         activity_name_title = Label(activity_name_frame, text="Activity name", font=("Montserrat Light", 10),
                                     bg="#2A2A2A",
@@ -178,41 +195,42 @@ class App(customtkinter.CTk):
         activity_name_title.pack(side=TOP, anchor=N, padx=0, pady=5)
         activity_name_input = Entry(activity_name_frame, font=("Montserrat Light", 10), bd=0, bg="#303030", fg="white",
                                     insertbackground="white", width=20,
-                                    textvariable=GeneralVariables.sidebar_activity_input, borderwidth=10, relief="flat")
+                                    textvariable=Configuration.sidebar_activity_input, borderwidth=10, relief="flat")
         activity_name_input.pack(side=TOP, anchor=N, padx=15, pady=15)
 
-        cycles_frame = Frame(GeneralVariables.sidebar_edit_task_container, bd=0, bg="#2A2A2A", height=30)
+        cycles_frame = Frame(Configuration.sidebar_edit_task_container, bd=0, bg="#2A2A2A", height=30)
         cycles_frame.place(relx=0, rely=0, x=15, y=320)
         cycles_title = Label(cycles_frame, text="Amount of cycles", font=("Montserrat Light", 10),
                              bg="#2A2A2A",
                              fg="white", width=15)
         cycles_title.pack(side=TOP, anchor=N, padx=0, pady=5)
         cycles_input = Entry(cycles_frame, font=("Montserrat Light", 10), bd=0, bg="#303030", fg="white",
-                             insertbackground="white", width=20, textvariable=GeneralVariables.sidebar_cycles_input,
+                             insertbackground="white", width=20, textvariable=Configuration.sidebar_cycles_input,
                              borderwidth=10,
                              relief="flat")
         cycles_input.pack(side=TOP, anchor=N, padx=15, pady=15)
 
         # Create a frame to simulate the button appearance
-        button_confirm_task_frame = Frame(GeneralVariables.sidebar_edit_task_container, bg="#303030", bd=1, relief="solid",
-                             highlightbackground=GeneralVariables.task_color,
-                             highlightthickness=1)
+        button_confirm_task_frame = Frame(Configuration.sidebar_edit_task_container, bg="#303030", bd=1, relief="solid",
+                                          highlightbackground=Configuration.task_color,
+                                          highlightthickness=1)
         button_confirm_task_frame.pack(side=BOTTOM, anchor=N, padx=10, pady=10)
 
         # Create a label inside the frame to display button text
         button_label = Button(button_confirm_task_frame, text="CONFIRM SETTINGS", fg="white", bg="#303030", bd=0,
-                              font=("Montserrat Light", 12), command=lambda: GeneralVariables.confirm_task_change(),
+                              font=("Montserrat Light", 12), command=lambda: Configuration.confirm_task_change(),
                               width=20)
         button_label.pack()
 
     @staticmethod
     def create_connection_container():
-        GeneralVariables.sidebar_add_connection_container = Frame(GeneralVariables.sidebar, bd=0, bg="#303030")
+        """Create the connection container in the sidebar."""
+        Configuration.sidebar_add_connection_container = Frame(Configuration.sidebar, bd=0, bg="#303030")
 
         # Create a frame to simulate the button appearance
-        button_add_mutex_frame = Frame(GeneralVariables.sidebar_add_connection_container, bg="#303030", bd=1,
+        button_add_mutex_frame = Frame(Configuration.sidebar_add_connection_container, bg="#303030", bd=1,
                                        relief="solid",
-                                       highlightbackground=GeneralVariables.task_color,
+                                       highlightbackground=Configuration.task_color,
                                        highlightthickness=1)
         button_add_mutex_frame.pack(side=BOTTOM, anchor=N, padx=10, pady=10)
 
@@ -224,9 +242,9 @@ class App(customtkinter.CTk):
 
 
         # Create a frame to simulate the button appearance
-        button_add_connection_frame = Frame(GeneralVariables.sidebar_add_connection_container, bg="#303030", bd=1, relief="solid",
-                             highlightbackground=GeneralVariables.task_color,
-                             highlightthickness=1)
+        button_add_connection_frame = Frame(Configuration.sidebar_add_connection_container, bg="#303030", bd=1, relief="solid",
+                                            highlightbackground=Configuration.task_color,
+                                            highlightthickness=1)
         button_add_connection_frame.pack(side=BOTTOM, anchor=N, padx=10, pady=10)
 
         # Create a label inside the frame to display button text
@@ -237,13 +255,14 @@ class App(customtkinter.CTk):
 
     @staticmethod
     def create_mutex_container():
-        GeneralVariables.sidebar_add_mutex_container = Frame(GeneralVariables.sidebar, bd=0, bg="#303030")
+        """Create the mutex container in the sidebar."""
+        Configuration.sidebar_add_mutex_container = Frame(Configuration.sidebar, bd=0, bg="#303030")
 
         # Create a frame to simulate the button appearance
-        button_add_mutex_frame = Frame(GeneralVariables.sidebar_add_mutex_container, bg="#303030", bd=1,
-                                            relief="solid",
-                                            highlightbackground=GeneralVariables.task_color,
-                                            highlightthickness=1)
+        button_add_mutex_frame = Frame(Configuration.sidebar_add_mutex_container, bg="#303030", bd=1,
+                                       relief="solid",
+                                       highlightbackground=Configuration.task_color,
+                                       highlightthickness=1)
         button_add_mutex_frame.pack(side=BOTTOM, anchor=N, padx=10, pady=10)
 
         # Create a label inside the frame to display button text
@@ -254,12 +273,13 @@ class App(customtkinter.CTk):
 
     @staticmethod
     def create_or_connection_container():
-        GeneralVariables.sidebar_add_or_connection_container = Frame(GeneralVariables.sidebar, bd=0, bg="#303030")
+        """Create the OR connection container in the sidebar."""
+        Configuration.sidebar_add_or_connection_container = Frame(Configuration.sidebar, bd=0, bg="#303030")
 
         # Create a frame to simulate the button appearance
-        button_add_or_connection_frame = Frame(GeneralVariables.sidebar_add_or_connection_container, bg="#303030", bd=1,
+        button_add_or_connection_frame = Frame(Configuration.sidebar_add_or_connection_container, bg="#303030", bd=1,
                                                relief="solid",
-                                               highlightbackground=GeneralVariables.task_color,
+                                               highlightbackground=Configuration.task_color,
                                                highlightthickness=1)
         button_add_or_connection_frame.pack(side=BOTTOM, anchor=N, padx=10, pady=10)
 
@@ -271,44 +291,49 @@ class App(customtkinter.CTk):
 
     @staticmethod
     def clear_canvas():
-        GeneralVariables.clear_general_variables()
-        GeneralVariables.canvas.delete("all")
+        """Clear the canvas and reset general variables."""
+        Configuration.clear_general_variables()
+        Configuration.canvas.delete("all")
 
     @staticmethod
     def step():
+        """Perform a single step in the simulation."""
         print("Step")
-        GeneralVariables.step_number += 1
-        for task in GeneralVariables.task_objects:
+        Configuration.step_number += 1
+        for task in Configuration.task_objects:
             task.try_step()
 
-        for mutex in GeneralVariables.mutex_objects:
-            GeneralVariables.mutex_objects[mutex].evaluate()
-            GeneralVariables.mutex_objects[mutex].update_visuals()
+        for mutex in Configuration.mutex_objects:
+            Configuration.mutex_objects[mutex].evaluate()
+            Configuration.mutex_objects[mutex].update_visuals()
 
     @staticmethod
     def add_task():
+        """Add a new task to the canvas."""
         print("Add task")
-        new_task = DraggableTask("?", "?", GeneralVariables.root.winfo_width() / 2, GeneralVariables.root.winfo_height() / 2, 50, 1, 0)
-        GeneralVariables.task_objects.append(new_task)
+        new_task = DraggableTask("?", "?", Configuration.root.winfo_width() / 2, Configuration.root.winfo_height() / 2, 50, 1, 0)
+        Configuration.task_objects.append(new_task)
 
     @staticmethod
     def add_or_connection():
-        sel_task = [task_object for task_object, position in GeneralVariables.selected_tasks.items() if str(position) == str(1)][0]
+        """Add an OR connection to the canvas."""
+        sel_task = [task_object for task_object, position in Configuration.selected_tasks.items() if str(position) == str(1)][0]
 
-        GeneralVariables.selected_connection.add_or_connection(sel_task)
-        sel_task.add_connector(GeneralVariables.selected_connection, "or")
+        Configuration.selected_connection.add_or_connection(sel_task)
+        sel_task.add_connector(Configuration.selected_connection, "or")
         sel_task.update_connections()
 
-        GeneralVariables.connector_objects.append([sel_task.task_name + sel_task.activity_name,
-                                                   GeneralVariables.selected_connection.name,
-                                                   "",
-                                                   0])
+        Configuration.connector_objects.append([sel_task.task_name + sel_task.activity_name,
+                                                Configuration.selected_connection.name,
+                                                "",
+                                                0])
 
     @staticmethod
     def add_connection():
+        """Add a new connection to the canvas."""
         print("Add connection")
-        origin_task = [task_object for task_object, position in GeneralVariables.selected_tasks.items() if str(position) == str(1)][0]
-        target_task = [task_object for task_object, position in GeneralVariables.selected_tasks.items() if str(position) == str(2)][0]
+        origin_task = [task_object for task_object, position in Configuration.selected_tasks.items() if str(position) == str(1)][0]
+        target_task = [task_object for task_object, position in Configuration.selected_tasks.items() if str(position) == str(2)][0]
 
         activity_connection = False
         if origin_task.task_name == target_task.task_name:
@@ -332,7 +357,7 @@ class App(customtkinter.CTk):
         end_task_name = target_task.task_name + target_task.activity_name
         initial_value = 0
 
-        GeneralVariables.connector_objects.append([start_task_name, connector_name, end_task_name, initial_value])
+        Configuration.connector_objects.append([start_task_name, connector_name, end_task_name, initial_value])
 
 
 if __name__ == "__main__":
