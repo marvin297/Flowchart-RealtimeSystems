@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Import necessary modules
 from General.Configuration import Configuration
+import asyncio
 
 
 class TaskConnector:
@@ -41,7 +42,7 @@ class TaskConnector:
         self.offset = offset
 
         self.semaphore_text = Configuration.canvas.create_text(0, 0, text=str(semaphore_value), fill=Configuration.root['bg'], font=("Montserrat Light", 12, "bold"))
-        self.semaphore_bg = Configuration.canvas.create_oval(0, 0, 0, 0, fill=Configuration.arrow_color if not activity_connection else Configuration.activity_arrow_color, outline=Configuration.arrow_color if not activity_connection else Configuration.activity_arrow_color)
+        self.semaphore_bg = Configuration.canvas.create_oval(0, 0, 0, 0, fill=Configuration.arrow_color if not activity_connection else Configuration.activity_arrow_color, outline="")
 
         Configuration.canvas.tag_bind(self.line, "<Button-1>", lambda event: self.on_click())
 
@@ -68,6 +69,25 @@ class TaskConnector:
         self.semaphore_value -= 1
         Configuration.canvas.itemconfig(self.semaphore_text, text=str(self.semaphore_value))
 
+        from threading import Thread
+        t = Thread(target=self.decrement_visualisation)
+        t.start()
+
+    def decrement_visualisation(self):
+        Configuration.canvas.itemconfig(self.semaphore_bg, fill="red")
+        Configuration.canvas.itemconfig(self.line, fill="red")
+
+        import time
+        if Configuration.auto_run:
+            time.sleep(Configuration.current_delay / 1000)
+        else:
+            time.sleep(1)
+
+        Configuration.canvas.itemconfig(self.semaphore_bg,
+                                        fill=Configuration.arrow_color if not self.activity_connection else Configuration.activity_arrow_color)
+        Configuration.canvas.itemconfig(self.line,
+                                        fill=Configuration.arrow_color if not self.activity_connection else Configuration.activity_arrow_color)
+
     def increment_semaphore(self, change_time):
         """
         Increment the semaphore value and update the visual representation.
@@ -79,6 +99,25 @@ class TaskConnector:
 
         self.semaphore_value += 1
         Configuration.canvas.itemconfig(self.semaphore_text, text=str(self.semaphore_value))
+
+        from threading import Thread
+        t = Thread(target=self.increment_visualisation)
+        t.start()
+
+    def increment_visualisation(self):
+        Configuration.canvas.itemconfig(self.semaphore_bg, fill="green")
+        Configuration.canvas.itemconfig(self.line, fill="green")
+
+        import time
+        if Configuration.auto_run:
+            time.sleep(Configuration.current_delay / 1000)
+        else:
+            time.sleep(1)
+
+        Configuration.canvas.itemconfig(self.semaphore_bg,
+                                        fill=Configuration.arrow_color if not self.activity_connection else Configuration.activity_arrow_color)
+        Configuration.canvas.itemconfig(self.line,
+                                        fill=Configuration.arrow_color if not self.activity_connection else Configuration.activity_arrow_color)
 
     def on_click(self):
         """Handle the click event on the connector."""

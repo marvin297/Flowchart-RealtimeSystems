@@ -38,7 +38,6 @@ class App(customtkinter.CTk):
     """Main application class."""
     sidebar = None
     show_sim_sidebar = False
-    running = False
 
     def __init__(self):
         super().__init__()
@@ -109,32 +108,30 @@ class App(customtkinter.CTk):
             self.show_sim_sidebar = True
             Configuration.simulation_sidebar.place(relx=0, rely=0, relheight=1, x=0)
 
-    current_delay = 1000
-
     def update_simulation_speed(self, value):
         """Update the simulation speed based on the slider value."""
         # Convert slider value to a delay (in milliseconds)
         self.current_delay = int(3000 + 1 - value)
-        print(f"Speed set to {value}, delay {self.current_delay} ms")
+        print(f"Speed set to {value}, delay {Configuration.current_delay} ms")
         self.update_speed_value()
 
     def start_simulation(self):
         """Start the simulation."""
-        if not self.running:
+        if not Configuration.auto_run:
             self.update_simulation_speed(value=1)
-            self.running = True
+            Configuration.auto_run = True
             self.run_periodically()
 
     def stop_simulation(self):
         """Stop the simulation."""
-        self.running = False
+        Configuration.auto_run = False
 
     def run_periodically(self):
         """Run the simulation periodically based on the current delay."""
-        if self.running:
+        if Configuration.auto_run:
             self.step()
             # Schedule the next call
-            self.after(self.current_delay, self.run_periodically)
+            self.after(Configuration.current_delay, self.run_periodically)
 
     def create_run_sidebar(self):
         """Create the simulation sidebar."""
@@ -159,7 +156,7 @@ class App(customtkinter.CTk):
 
     def update_speed_value(self):
         """Update the displayed speed value."""
-        self.dynamic_value_label.configure(text=f"Period per Cycle: {self.current_delay}ms")
+        self.dynamic_value_label.configure(text=f"Period per Cycle: {Configuration.current_delay}ms")
 
     def create_sidebar(self):
         """Create the main sidebar."""

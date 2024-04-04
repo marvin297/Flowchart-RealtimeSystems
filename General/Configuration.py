@@ -61,8 +61,13 @@ class Configuration:
     # Variable to store the last import file path
     last_import_file_path = ""
 
+    # Variables to store the available mutex types
     available_mutex_types = ['Priority Ceiling', 'Priority Inversion', 'Ticket Lock', 'First Come First Serve']
     selected_mutex_type = 'First Come First Serve'
+
+    # Variables to store auto run settings
+    current_delay = 1000
+    auto_run = False
 
     @staticmethod
     def set_mutex_type(new_type_name):
@@ -196,6 +201,12 @@ class Configuration:
         Args:
             show (bool): Whether to show or hide the sidebar. Defaults to True.
         """
+        from threading import Thread
+        t = Thread(target=Configuration._sidebar_animation, args=(show,))
+        t.start()
+
+    @staticmethod
+    def _sidebar_animation(show):
         import time
 
         if Configuration.sidebar.winfo_x() == -300 and show:
