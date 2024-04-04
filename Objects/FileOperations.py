@@ -36,6 +36,7 @@ from General.Configuration import Configuration
 from Mutex.MutexPriorityInversion import MutexPriorityInversion
 from Mutex.MutexPriorityCeiling import MutexPriorityCeiling
 from Mutex.MutexTicketLock import MutexTicketLock
+from Mutex.MutexFirstComeFirstServe import MutexFirstComeFirstServe
 
 
 # Function to load files from a file dialog or a predefined path
