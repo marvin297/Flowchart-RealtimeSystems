@@ -67,6 +67,7 @@ class App(customtkinter.CTk):
         button_file_menu = menubar.add_cascade("File")
         button_edit_menu = menubar.add_cascade("Edit")
         button_run_menu = menubar.add_cascade("Run")
+        button_mutex_menu = menubar.add_cascade("Mutex")
 
         # Create file menu
         filemenu = CustomDropdownMenu(widget=button_file_menu, border_color="")
@@ -87,6 +88,11 @@ class App(customtkinter.CTk):
         runmenu = CustomDropdownMenu(widget=button_run_menu, border_color="")
         runmenu.add_option(option="Next step", command=App.step)
         runmenu.add_option(option="Hide/Show Simulation Sidebar", command=self.toggle_simulation_sidebar)
+
+        # Create mutex selection menu
+        mutexmenu = CustomDropdownMenu(widget=button_mutex_menu, border_color="")
+        for available_mutex_type_name in Configuration.available_mutex_types:
+            mutexmenu.add_option(option="Load using " + available_mutex_type_name, command=lambda: Configuration.set_mutex_type(available_mutex_type_name))
 
         # Create sidebars
         self.create_sidebar()

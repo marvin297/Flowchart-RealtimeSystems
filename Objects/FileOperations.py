@@ -29,9 +29,13 @@ It also utilizes the pandas library to read from and write to Excel files.
 from tkinter import filedialog
 import pandas as pd
 from Objects.DraggableTask import DraggableTask
-from Mutex.MutexPriorityInversion import MutexPriorityInversion
 from Objects.TaskConnector import TaskConnector
 from General.Configuration import Configuration
+
+# Import available mutex types
+from Mutex.MutexPriorityInversion import MutexPriorityInversion
+from Mutex.MutexPriorityCeiling import MutexPriorityCeiling
+from Mutex.MutexTicketLock import MutexTicketLock
 
 
 # Function to load files from a file dialog or a predefined path
@@ -61,6 +65,9 @@ def load_files(show_file_dialog=False):
     # Clear general variables and canvas
     Configuration.clear_general_variables()
     Configuration.canvas.delete("all")
+
+    selected_mutex_class_name = "Mutex" + Configuration.selected_mutex_type.replace(' ', '')
+    selected_mutex_class = globals()[selected_mutex_class_name]
 
     # Iterate over rows in the DataFrame
     for index, row in table_of_content.iterrows():
@@ -104,7 +111,7 @@ def load_files(show_file_dialog=False):
                         for mutex_name in mutex_names:
                             if mutex_name not in Configuration.mutex_objects:
                                 Configuration.mutex_objects.update({
-                                    mutex_name: MutexPriorityInversion()
+                                    mutex_name: selected_mutex_class()
                                 })
 
                             mutexes.append(Configuration.mutex_objects[mutex_name])

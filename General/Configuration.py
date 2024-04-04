@@ -61,6 +61,13 @@ class Configuration:
     # Variable to store the last import file path
     last_import_file_path = ""
 
+    available_mutex_types = ['Priority Ceiling', 'Priority Inversion', 'Ticket Lock']
+    selected_mutex_type = 'Priority Ceiling'
+
+    @staticmethod
+    def set_mutex_type(new_type_name):
+        Configuration.selected_mutex_type = new_type_name
+
     @staticmethod
     def clear_general_variables():
         """
