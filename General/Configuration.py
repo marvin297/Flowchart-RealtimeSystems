@@ -31,6 +31,7 @@ class Configuration:
     sidebar_task_input = None
     sidebar_activity_input = None
     sidebar_cycles_input = None
+    sidebar_simulation = None
 
     # Variable to store reference to the simulation sidebar
     simulation_sidebar = None
@@ -68,6 +69,7 @@ class Configuration:
     # Variables to store auto run settings
     current_delay = 1000
     auto_run = False
+    show_simulation_container = False
 
     @staticmethod
     def set_mutex_type(new_type_name):
@@ -157,6 +159,7 @@ class Configuration:
                 Configuration.sidebar_add_connection_container.pack_forget()
                 Configuration.sidebar_edit_task_container.pack_forget()
                 Configuration.sidebar_add_mutex_container.pack_forget()
+                Configuration.sidebar_simulation.pack_forget()
             elif len(Configuration.selected_tasks) == 2:
                 Configuration.sidebar_add_connection_container.pack(
                     fill="both", expand=True
@@ -164,6 +167,7 @@ class Configuration:
                 Configuration.sidebar_edit_task_container.pack_forget()
                 Configuration.sidebar_add_mutex_container.pack_forget()
                 Configuration.sidebar_add_or_connection_container.pack_forget()
+                Configuration.sidebar_simulation.pack_forget()
             elif len(Configuration.selected_tasks) == 1:
                 Configuration.sidebar_edit_task_container.pack(
                     fill="both", expand=True
@@ -171,6 +175,7 @@ class Configuration:
                 Configuration.sidebar_add_connection_container.pack_forget()
                 Configuration.sidebar_add_mutex_container.pack_forget()
                 Configuration.sidebar_add_or_connection_container.pack_forget()
+                Configuration.sidebar_simulation.pack_forget()
             else:
                 Configuration.sidebar_add_mutex_container.pack(
                     fill="both", expand=True
@@ -178,6 +183,7 @@ class Configuration:
                 Configuration.sidebar_edit_task_container.pack_forget()
                 Configuration.sidebar_add_connection_container.pack_forget()
                 Configuration.sidebar_add_or_connection_container.pack_forget()
+                Configuration.sidebar_simulation.pack_forget()
 
             Configuration.toggle_sidebar(True)
 
@@ -190,6 +196,14 @@ class Configuration:
             Configuration.sidebar_cycles_input.set(
                 list(Configuration.selected_tasks.keys())[0].task_max_cycles
             )
+        elif Configuration.show_simulation_container:
+            Configuration.sidebar_simulation.pack(
+                fill="both", expand=True
+            )
+            Configuration.sidebar_add_connection_container.pack_forget()
+            Configuration.sidebar_edit_task_container.pack_forget()
+            Configuration.sidebar_add_mutex_container.pack_forget()
+            Configuration.sidebar_add_or_connection_container.pack_forget()
         else:
             Configuration.toggle_sidebar(False)
 
@@ -211,11 +225,13 @@ class Configuration:
 
         if Configuration.sidebar.winfo_x() == -300 and show:
             for i in range(0, 301, 10):
+                Configuration.canvas.place(x=i, relwidth=1.0, relheight=1.0)
                 Configuration.sidebar.place(relx=0, rely=0, relheight=1, x=-300 + i)
                 Configuration.sidebar.update()
                 time.sleep(0.001)
         elif Configuration.sidebar.winfo_x() == 0 and not show:
             for i in range(0, 301, 10):
+                Configuration.canvas.place(x=300 - i)
                 Configuration.sidebar.place(relx=0, rely=0, relheight=1, x=-i)
                 Configuration.sidebar.update()
                 time.sleep(0.001)

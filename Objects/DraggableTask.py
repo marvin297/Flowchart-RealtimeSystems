@@ -311,6 +311,9 @@ class DraggableTask:
     def switch_selection():
         """Switch the selection mode of the tasks."""
         print("change")
+        if Configuration.show_simulation_container:
+            return
+
         Configuration.edit_mode = not Configuration.edit_mode
 
         for task in Configuration.selected_tasks:

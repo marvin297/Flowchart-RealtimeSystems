@@ -95,23 +95,20 @@ class App(customtkinter.CTk):
 
         # Create sidebars
         self.create_sidebar()
-        self.create_run_sidebar()
 
     def toggle_simulation_sidebar(self):
         """Toggle visibility of the simulation sidebar."""
-        if self.show_sim_sidebar:
-            self.show_sim_sidebar = False
-            Configuration.simulation_sidebar.place(relx=0, rely=0, relheight=1, x=-300)
-            print(f"------------hidden")
-        else:
-            print(f"------------shown")
-            self.show_sim_sidebar = True
-            Configuration.simulation_sidebar.place(relx=0, rely=0, relheight=1, x=0)
+        if Configuration.edit_mode:
+            return
+
+        Configuration.show_simulation_container = not Configuration.show_simulation_container
+        Configuration.toggle_sidebar(Configuration.show_simulation_container)
+        Configuration._update_sidebar()
 
     def update_simulation_speed(self, value):
         """Update the simulation speed based on the slider value."""
         # Convert slider value to a delay (in milliseconds)
-        self.current_delay = int(3000 + 1 - value)
+        Configuration.current_delay = int(3000 + 1 - value)
         print(f"Speed set to {value}, delay {Configuration.current_delay} ms")
         self.update_speed_value()
 
@@ -133,25 +130,25 @@ class App(customtkinter.CTk):
             # Schedule the next call
             self.after(Configuration.current_delay, self.run_periodically)
 
-    def create_run_sidebar(self):
+    def create_run_container(self):
         """Create the simulation sidebar."""
-        Configuration.simulation_sidebar = Frame(self, width=300, bd=0, bg="#303030", height=300)
-        Configuration.simulation_sidebar.place(relx=0, rely=0, relheight=1, x=-300)
-        sidebar_title = Label(Configuration.simulation_sidebar, text="Simulation", font=("Montserrat Light", 20), bg="#2A2A2A", fg="white", width=15)
+        Configuration.sidebar_simulation = Frame(Configuration.sidebar, bd=0, bg="#303030")
+
+        sidebar_title = Label(Configuration.sidebar_simulation, text="Simulation", font=("Montserrat Light", 20), bg="#2A2A2A", fg="white", width=15)
         sidebar_title.pack(side=TOP, anchor=N, padx=0, pady=10)
 
-        sim_start_button = customtkinter.CTkButton(Configuration.simulation_sidebar, text="Start", command=self.start_simulation)
+        sim_start_button = customtkinter.CTkButton(Configuration.sidebar_simulation, text="Start", command=self.start_simulation)
         sim_start_button.pack(pady=10, padx=10)
 
-        sim_end_button = customtkinter.CTkButton(Configuration.simulation_sidebar, text="Stop", command=self.stop_simulation)
+        sim_end_button = customtkinter.CTkButton(Configuration.sidebar_simulation, text="Stop", command=self.stop_simulation)
         sim_end_button.pack(pady=10, padx=10)
 
-        speed_slider = customtkinter.CTkSlider(Configuration.simulation_sidebar, from_=1, to=3000, number_of_steps=3000)
+        speed_slider = customtkinter.CTkSlider(Configuration.sidebar_simulation, from_=1, to=3000, number_of_steps=3000)
         speed_slider.pack(side=customtkinter.TOP, fill=customtkinter.X, padx=10, pady=10)
         speed_slider.set(1000)  # Set default speed value
         speed_slider.configure(command=self.update_simulation_speed)
 
-        self.dynamic_value_label = customtkinter.CTkLabel(Configuration.simulation_sidebar, text="Period per Cycle: 1000ms", bg_color=self['bg'], fg_color="#303030")
+        self.dynamic_value_label = customtkinter.CTkLabel(Configuration.sidebar_simulation, text="Period per Cycle: 1000ms", bg_color=self['bg'], fg_color="#303030")
         self.dynamic_value_label.pack(pady=10)
 
     def update_speed_value(self):
@@ -174,6 +171,7 @@ class App(customtkinter.CTk):
         App.create_connection_container()
         App.create_mutex_container()
         App.create_or_connection_container()
+        self.create_run_container()
 
     @staticmethod
     def create_edit_task_container():
