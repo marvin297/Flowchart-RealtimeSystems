@@ -79,7 +79,7 @@ class TaskConnector:
 
         import time
         if Configuration.auto_run:
-            time.sleep(Configuration.current_delay / 1000)
+            time.sleep(Configuration.current_delay / 1000 / 2)
         else:
             time.sleep(1)
 
@@ -110,7 +110,7 @@ class TaskConnector:
 
         import time
         if Configuration.auto_run:
-            time.sleep(Configuration.current_delay / 1000)
+            time.sleep(Configuration.current_delay / 1000 / 2)
         else:
             time.sleep(1)
 
