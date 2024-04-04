@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 # Import necessary modules
 from General.Configuration import Configuration
-import asyncio
+import time
+import math
 
 
 class TaskConnector:
@@ -77,11 +78,46 @@ class TaskConnector:
         Configuration.canvas.itemconfig(self.semaphore_bg, fill="red")
         Configuration.canvas.itemconfig(self.line, fill="red")
 
-        import time
-        if Configuration.auto_run:
-            time.sleep(Configuration.current_delay / 1000 / 2)
-        else:
-            time.sleep(1)
+        x1, y1, x2, y2 = Configuration.canvas.coords(self.line)
+        slope = (y1 - y2) / (x1 - x2)
+
+        angle = math.atan(slope)
+        angle = math.degrees(angle)
+        c = math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+
+        max_length = (c - self.circle_radius) / 2
+        circle_radius_x100 = self.circle_radius * 100
+        max_length_x100 = int(max_length * 100)
+        step_size = int(max_length_x100 / 100)
+        step_amount = int(max_length_x100 / step_size)
+
+        line = Configuration.canvas.create_line(0, 0, 0, 0, width=5, fill="#ff707c", arrow="last",
+                                                arrowshape=(15, 15, 1.5), smooth=True)
+
+        for current_length_x100 in range(circle_radius_x100, max_length_x100 + circle_radius_x100, step_size):
+            current_length = (max_length_x100 + current_length_x100) / 100
+            if x1 <= x2:
+                start_x = x1 + (current_length - 10) * math.cos(math.radians(angle))
+                start_y = y1 + (current_length - 10) * math.sin(math.radians(angle))
+
+                end_x = x1 + current_length * math.cos(math.radians(angle))
+                end_y = y1 + current_length * math.sin(math.radians(angle))
+            else:
+                start_x = x1 - (current_length - 10) * math.cos(math.radians(angle))
+                start_y = y1 - (current_length - 10) * math.sin(math.radians(angle))
+
+                end_x = x1 - current_length * math.cos(math.radians(angle))
+                end_y = y1 - current_length * math.sin(math.radians(angle))
+
+            Configuration.canvas.coords(line, start_x, start_y, end_x, end_y)
+            Configuration.canvas.update()
+
+            if Configuration.auto_run:
+                time.sleep(Configuration.current_delay / 1000 / step_amount / 2)
+            else:
+                time.sleep(0.005)
+
+        Configuration.canvas.delete(line)
 
         Configuration.canvas.itemconfig(self.semaphore_bg,
                                         fill=Configuration.arrow_color if not self.activity_connection else Configuration.activity_arrow_color)
@@ -108,11 +144,46 @@ class TaskConnector:
         Configuration.canvas.itemconfig(self.semaphore_bg, fill="green")
         Configuration.canvas.itemconfig(self.line, fill="green")
 
-        import time
-        if Configuration.auto_run:
-            time.sleep(Configuration.current_delay / 1000 / 2)
-        else:
-            time.sleep(1)
+        x1, y1, x2, y2 = Configuration.canvas.coords(self.line)
+        slope = (y1 - y2) / (x1 - x2)
+
+        angle = math.atan(slope)
+        angle = math.degrees(angle)
+        c = math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+
+        max_length = (c - self.circle_radius) / 2
+        circle_radius_x100 = self.circle_radius * 100
+        max_length_x100 = int(max_length * 100)
+        step_size = int(max_length_x100 / 100)
+        step_amount = int(max_length_x100 / step_size)
+
+        line = Configuration.canvas.create_line(0, 0, 0, 0, width=5, fill="#61ff4a", arrow="last",
+                                             arrowshape=(15, 15, 1.5), smooth=True)
+
+        for current_length_x100 in range(circle_radius_x100, max_length_x100 + circle_radius_x100, step_size):
+            current_length = current_length_x100 / 100
+            if x1 <= x2:
+                start_x = x1 + (current_length - 10) * math.cos(math.radians(angle))
+                start_y = y1 + (current_length - 10) * math.sin(math.radians(angle))
+
+                end_x = x1 + current_length * math.cos(math.radians(angle))
+                end_y = y1 + current_length * math.sin(math.radians(angle))
+            else:
+                start_x = x1 - (current_length - 10) * math.cos(math.radians(angle))
+                start_y = y1 - (current_length - 10) * math.sin(math.radians(angle))
+
+                end_x = x1 - current_length * math.cos(math.radians(angle))
+                end_y = y1 - current_length * math.sin(math.radians(angle))
+
+            Configuration.canvas.coords(line, start_x, start_y, end_x, end_y)
+            Configuration.canvas.update()
+
+            if Configuration.auto_run:
+                time.sleep(Configuration.current_delay / 1000 / step_amount / 2)
+            else:
+                time.sleep(0.005)
+
+        Configuration.canvas.delete(line)
 
         Configuration.canvas.itemconfig(self.semaphore_bg,
                                         fill=Configuration.arrow_color if not self.activity_connection else Configuration.activity_arrow_color)
@@ -139,9 +210,6 @@ class TaskConnector:
 
     def update_visuals(self):
         """Update the visual appearance of the connector based on its selection state."""
-        selected_color = None
-        reset_color = None
-
         if self.activity_connection:
             selected_color = Configuration.activity_arrow_color_selected
             reset_color = Configuration.activity_arrow_color
