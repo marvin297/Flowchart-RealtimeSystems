@@ -71,58 +71,8 @@ class TaskConnector:
         Configuration.canvas.itemconfig(self.semaphore_text, text=str(self.semaphore_value))
 
         from threading import Thread
-        t = Thread(target=self.decrement_visualisation)
+        t = Thread(target=self.visualise_semaphore_change, args=(True,))
         t.start()
-
-    def decrement_visualisation(self):
-        Configuration.canvas.itemconfig(self.semaphore_bg, fill="red")
-        Configuration.canvas.itemconfig(self.line, fill="red")
-
-        x1, y1, x2, y2 = Configuration.canvas.coords(self.line)
-        slope = (y1 - y2) / (x1 - x2)
-
-        angle = math.atan(slope)
-        angle = math.degrees(angle)
-        c = math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
-
-        max_length = (c - self.circle_radius) / 2
-        circle_radius_x100 = self.circle_radius * 100
-        max_length_x100 = int(max_length * 100)
-        step_size = int(max_length_x100 / 100)
-        step_amount = int(max_length_x100 / step_size)
-
-        line = Configuration.canvas.create_line(0, 0, 0, 0, width=5, fill="#ff707c", arrow="last",
-                                                arrowshape=(15, 15, 1.5), smooth=True)
-
-        for current_length_x100 in range(circle_radius_x100, max_length_x100 + circle_radius_x100, step_size):
-            current_length = (max_length_x100 + current_length_x100) / 100
-            if x1 <= x2:
-                start_x = x1 + (current_length - 10) * math.cos(math.radians(angle))
-                start_y = y1 + (current_length - 10) * math.sin(math.radians(angle))
-
-                end_x = x1 + current_length * math.cos(math.radians(angle))
-                end_y = y1 + current_length * math.sin(math.radians(angle))
-            else:
-                start_x = x1 - (current_length - 10) * math.cos(math.radians(angle))
-                start_y = y1 - (current_length - 10) * math.sin(math.radians(angle))
-
-                end_x = x1 - current_length * math.cos(math.radians(angle))
-                end_y = y1 - current_length * math.sin(math.radians(angle))
-
-            Configuration.canvas.coords(line, start_x, start_y, end_x, end_y)
-            Configuration.canvas.update()
-
-            if Configuration.auto_run:
-                time.sleep(Configuration.current_delay / 1000 / step_amount / 2)
-            else:
-                time.sleep(0.005)
-
-        Configuration.canvas.delete(line)
-
-        Configuration.canvas.itemconfig(self.semaphore_bg,
-                                        fill=Configuration.arrow_color if not self.activity_connection else Configuration.activity_arrow_color)
-        Configuration.canvas.itemconfig(self.line,
-                                        fill=Configuration.arrow_color if not self.activity_connection else Configuration.activity_arrow_color)
 
     def increment_semaphore(self, change_time):
         """
@@ -137,13 +87,10 @@ class TaskConnector:
         Configuration.canvas.itemconfig(self.semaphore_text, text=str(self.semaphore_value))
 
         from threading import Thread
-        t = Thread(target=self.increment_visualisation)
+        t = Thread(target=self.visualise_semaphore_change, args=(False,))
         t.start()
 
-    def increment_visualisation(self):
-        Configuration.canvas.itemconfig(self.semaphore_bg, fill="green")
-        Configuration.canvas.itemconfig(self.line, fill="green")
-
+    def visualise_semaphore_change(self, decrement=False):
         x1, y1, x2, y2 = Configuration.canvas.coords(self.line)
         slope = (y1 - y2) / (x1 - x2)
 
@@ -151,17 +98,23 @@ class TaskConnector:
         angle = math.degrees(angle)
         c = math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
-        max_length = (c - self.circle_radius) / 2
-        circle_radius_x100 = self.circle_radius * 100
-        max_length_x100 = int(max_length * 100)
-        step_size = int(max_length_x100 / 100)
-        step_amount = int(max_length_x100 / step_size)
+        arrow_length = 15
+        max_length = (c - self.circle_radius) / 2 - arrow_length
 
-        line = Configuration.canvas.create_line(0, 0, 0, 0, width=5, fill="#61ff4a", arrow="last",
-                                             arrowshape=(15, 15, 1.5), smooth=True)
+        color = "red" if decrement else "green"
+        highlight_color = "#f74545" if decrement else "#61ff4a"
 
-        for current_length_x100 in range(circle_radius_x100, max_length_x100 + circle_radius_x100, step_size):
-            current_length = current_length_x100 / 100
+        line = Configuration.canvas.create_line(0, 0, 0, 0, width=5, fill=highlight_color, arrow="last",
+                                                arrowshape=(arrow_length, arrow_length, 1.5), smooth=True)
+        Configuration.canvas.itemconfig(self.semaphore_bg, fill=color)
+        Configuration.canvas.itemconfig(self.line, fill=color)
+
+        for i in range(0, 100, 1):
+            if decrement:
+                current_length = max_length + (max_length / 100) * i + self.circle_radius + arrow_length
+            else:
+                current_length = (max_length / 100) * i + self.circle_radius + arrow_length
+
             if x1 <= x2:
                 start_x = x1 + (current_length - 10) * math.cos(math.radians(angle))
                 start_y = y1 + (current_length - 10) * math.sin(math.radians(angle))
@@ -179,7 +132,7 @@ class TaskConnector:
             Configuration.canvas.update()
 
             if Configuration.auto_run:
-                time.sleep(Configuration.current_delay / 1000 / step_amount / 2)
+                time.sleep(Configuration.current_delay / 1000 / 100 / 2)
             else:
                 time.sleep(0.005)
 
