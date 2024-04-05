@@ -78,7 +78,7 @@ class DraggableTask:
         Configuration.canvas.tag_bind(self.activity_label, "<B1-Motion>", lambda event: self.on_drag(event))
         Configuration.canvas.tag_bind(self.cycle_label, "<B1-Motion>", lambda event: self.on_drag(event))
 
-        Configuration.canvas.pack()
+        #Configuration.canvas.pack()
 
     def delete(self):
         """Delete the task and its associated elements from the canvas."""

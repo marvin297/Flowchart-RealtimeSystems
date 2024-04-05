@@ -47,7 +47,7 @@ class TaskConnector:
 
         Configuration.canvas.tag_bind(self.line, "<Button-1>", lambda event: self.on_click())
 
-        Configuration.canvas.pack()
+        #Configuration.canvas.pack()
 
     def delete(self):
         """Delete the connector and its associated objects from the canvas."""
@@ -146,6 +146,9 @@ class TaskConnector:
     def on_click(self):
         """Handle the click event on the connector."""
         print("selected")
+        if not Configuration.edit_mode:
+            return
+
         if Configuration.selected_connection != self:
             if Configuration.selected_connection is not None:
                 Configuration.selected_connection.selected = False

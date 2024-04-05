@@ -23,7 +23,7 @@ class MutexBase(ABC):
                                                             fill=Configuration.mutex_color,
                                                             outline=Configuration.mutex_color)
 
-        Configuration.canvas.pack()
+        #Configuration.canvas.pack()
 
     def add_task(self, task):
         self.connected_tasks.append(task)
@@ -46,8 +46,13 @@ class MutexBase(ABC):
 
         # iterate over connected tasks name
         mutex_name = "m" + "".join([task.task_name for task in self.connected_tasks])
+        if mutex_name != self.name:
+            print(Configuration.mutex_objects.keys())
+            Configuration.mutex_objects.pop(self.name)
+            self.name = mutex_name
+            Configuration.mutex_objects.update({self.name: self})
 
-        Configuration.canvas.itemconfig(self.mutex_text, text=mutex_name)
+        Configuration.canvas.itemconfig(self.mutex_text, text=self.name)
         Configuration.canvas.itemconfig(self.locked_text, text=("Locked" if self.lock else "Unlocked"))
 
         sx1, sy1, sx2, sy2 = Configuration.canvas.bbox(self.mutex_text)

@@ -111,9 +111,11 @@ def load_files(show_file_dialog=False):
                         mutex_names = mutex_string.split(",")
                         for mutex_name in mutex_names:
                             if mutex_name not in Configuration.mutex_objects:
+                                new_mutex_object = selected_mutex_class()
                                 Configuration.mutex_objects.update({
-                                    mutex_name: selected_mutex_class()
+                                    mutex_name: new_mutex_object
                                 })
+                                new_mutex_object.name = mutex_name
 
                             mutexes.append(Configuration.mutex_objects[mutex_name])
                     else:

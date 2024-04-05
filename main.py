@@ -33,6 +33,12 @@ from CTkMenuBar import *
 from General.Configuration import Configuration
 from Objects.TaskConnector import TaskConnector
 
+# Import available mutex types
+from Mutex.MutexPriorityInversion import MutexPriorityInversion
+from Mutex.MutexPriorityCeiling import MutexPriorityCeiling
+from Mutex.MutexTicketLock import MutexTicketLock
+from Mutex.MutexFirstComeFirstServe import MutexFirstComeFirstServe
+
 
 class App(customtkinter.CTk):
     """Main application class."""
@@ -237,7 +243,7 @@ class App(customtkinter.CTk):
 
         # Create a label inside the frame to display button text
         button_label = Button(button_add_mutex_frame, text="ADD MUTEX", fg="white", bg="#303030", bd=0,
-                              font=("Montserrat Light", 12), command=lambda: print("NOT YET IMPLEMENTED"),
+                              font=("Montserrat Light", 12), command=lambda: App.add_new_mutex(),
                               width=20)
         button_label.pack()
 
@@ -268,7 +274,7 @@ class App(customtkinter.CTk):
 
         # Create a label inside the frame to display button text
         button_label = Button(button_add_mutex_frame, text="ADD MUTEX", fg="white", bg="#303030", bd=0,
-                              font=("Montserrat Light", 12), command=lambda: print("NOT YET IMPLEMENTED"),
+                              font=("Montserrat Light", 12), command=lambda: App.add_new_mutex(),
                               width=20)
         button_label.pack()
 
@@ -359,6 +365,23 @@ class App(customtkinter.CTk):
         initial_value = 0
 
         Configuration.connector_objects.append([start_task_name, connector_name, end_task_name, initial_value])
+
+    @staticmethod
+    def add_new_mutex():
+        selected_mutex_class_name = "Mutex" + Configuration.selected_mutex_type.replace(' ', '')
+        selected_mutex_class = globals()[selected_mutex_class_name]
+
+        new_mutex = selected_mutex_class()
+
+        Configuration.mutex_objects.update({
+            new_mutex.name: new_mutex
+        })
+
+        for task in Configuration.selected_tasks:
+            task.add_mutex(new_mutex)
+            new_mutex.add_task(task)
+
+        new_mutex.update_visuals()
 
 
 if __name__ == "__main__":
