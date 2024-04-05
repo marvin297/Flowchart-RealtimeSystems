@@ -31,7 +31,8 @@ from General.FileOperations import load_files, save_file
 from Objects.DraggableTask import DraggableTask
 from CTkMenuBar import *
 from General.Configuration import Configuration
-from Objects.Connection.TaskConnection import TaskConnector
+from Objects.Connection.ConnectionActivity import ConnectionActivity
+from Objects.Connection.ConnectionTask import ConnectionTask
 
 # Import available mutex types
 from Objects.Mutex.MutexPriorityInversion import MutexPriorityInversion
@@ -92,7 +93,7 @@ class App(customtkinter.CTk):
         # Create run menu
         runmenu = CustomDropdownMenu(widget=button_run_menu, border_color="")
         runmenu.add_option(option="Next step", command=App.step)
-        runmenu.add_option(option="Hide/Show Simulation Sidebar", command=self.toggle_simulation_sidebar)
+        runmenu.add_option(option="Hide/Show Simulation Sidebar", command=Configuration.toggle_simulation_sidebar)
 
         # Create mutex selection menu
         mutexmenu = CustomDropdownMenu(widget=button_mutex_menu, border_color="")
@@ -101,15 +102,6 @@ class App(customtkinter.CTk):
 
         # Create sidebars
         self.create_sidebar()
-
-    def toggle_simulation_sidebar(self):
-        """Toggle visibility of the simulation sidebar."""
-        if Configuration.edit_mode:
-            return
-
-        Configuration.show_simulation_container = not Configuration.show_simulation_container
-        Configuration.toggle_sidebar(Configuration.show_simulation_container)
-        Configuration._update_sidebar()
 
     def update_simulation_speed(self, value):
         """Update the simulation speed based on the slider value."""
@@ -154,12 +146,12 @@ class App(customtkinter.CTk):
         speed_slider.set(1000)  # Set default speed value
         speed_slider.configure(command=self.update_simulation_speed)
 
-        self.dynamic_value_label = customtkinter.CTkLabel(Configuration.sidebar_simulation, text="Period per Cycle: 1000ms", bg_color=self['bg'], fg_color="#303030")
-        self.dynamic_value_label.pack(pady=10)
+        Configuration.dynamic_value_label = customtkinter.CTkLabel(Configuration.sidebar_simulation, text="Period per Cycle: 1000ms", bg_color=self['bg'], fg_color="#303030")
+        Configuration.dynamic_value_label.pack(pady=10)
 
     def update_speed_value(self):
         """Update the displayed speed value."""
-        self.dynamic_value_label.configure(text=f"Period per Cycle: {Configuration.current_delay}ms")
+        Configuration.dynamic_value_label.configure(text=f"Period per Cycle: {Configuration.current_delay}ms")
 
     def create_sidebar(self):
         """Create the main sidebar."""
@@ -342,17 +334,18 @@ class App(customtkinter.CTk):
         origin_task = [task_object for task_object, position in Configuration.selected_tasks.items() if str(position) == str(1)][0]
         target_task = [task_object for task_object, position in Configuration.selected_tasks.items() if str(position) == str(2)][0]
 
-        activity_connection = False
-        if origin_task.task_name == target_task.task_name:
-            activity_connection = True
-
         new_offset = 0
         for connection in origin_task.connectors:
             if connection in target_task.connectors:
                 connection.offset = 50
                 new_offset = -50
 
-        new_connection = TaskConnector("?", 0, activity_connection, new_offset)
+        is_activity_connection = origin_task.task_name == target_task.task_name
+        if is_activity_connection:
+            new_connection = ConnectionActivity("?", 0, new_offset)
+        else:
+            new_connection = ConnectionTask("?", 0, new_offset)
+
         origin_task.add_connector(new_connection, "start")
         target_task.add_connector(new_connection, "end")
 

@@ -29,8 +29,10 @@ It also utilizes the pandas library to read from and write to Excel files.
 from tkinter import filedialog
 import pandas as pd
 from Objects.DraggableTask import DraggableTask
-from Objects.Connection.TaskConnection import TaskConnector
+from Objects.Connection.ConnectionActivity import ConnectionActivity
+from Objects.Connection.ConnectionTask import ConnectionTask
 from General.Configuration import Configuration
+import math
 
 # Import available mutex types
 from Objects.Mutex.MutexPriorityInversion import MutexPriorityInversion
@@ -57,8 +59,6 @@ def load_files(show_file_dialog=False):
     # If no file path is provided, return without doing anything
     if Configuration.last_import_file_path == "":
         return
-
-    import math
 
     # Read the first sheet of the Excel file into a pandas DataFrame
     table_of_content = pd.read_excel(Configuration.last_import_file_path)
@@ -227,15 +227,16 @@ def load_files(show_file_dialog=False):
         start_task_id = re.findall(r'\d+', start_task_name)
         end_task_id = re.findall(r'\d+', end_task_name)
 
-        activity_connection = False
+        connector = None
 
         # Check if start and end tasks have the same ID
         if len(end_task_id) > 0:
             if start_task_id[0] == end_task_id[0]:
-                activity_connection = True
+                connector = ConnectionActivity(connector_name, initial_value, offset)
 
         # Create a new TaskConnector object
-        connector = TaskConnector(connector_name, semaphore_value=initial_value, activity_connection=activity_connection, offset=offset)
+        if connector is None:
+            connector = ConnectionTask(connector_name, initial_value, offset)
         Configuration.connector_objects.append([start_task_name, connector_name, end_task_name, initial_value])
 
         # Add connector to start and end tasks

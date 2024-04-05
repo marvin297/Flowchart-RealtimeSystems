@@ -3,9 +3,10 @@
 from General.Configuration import Configuration
 import time
 import math
+from abc import ABC
 
 
-class TaskConnector:
+class ConnectionBase(ABC):
     """
     A class representing a connector between tasks in a workflow.
 
@@ -16,26 +17,33 @@ class TaskConnector:
     are moved or modified.
     """
 
-    def __init__(self, name, semaphore_value=0, activity_connection=False, offset=0):
+    def __init__(self, name, arrow_color, arrow_color_selected, arrow_head_style, line_width, semaphore_value=0, offset=0):
         """
         Initialize a new instance of the TaskConnector class.
 
         Args:
             name (str): The name of the connector.
+            arrow_color (str): The color of the connector.
+            arrow_color_selected (str): The color of the connector when selected.
+            arrow_head_style (tuple): The style of the arrow head.
             semaphore_value (int, optional): The initial semaphore value. Defaults to 0.
-            activity_connection (bool, optional): Indicates if the connector represents an activity connection. Defaults to False.
             offset (int, optional): The offset value for positioning the connector. Defaults to 0.
         """
         self.name = name
         self.circle_radius = 50
-        self.line = Configuration.canvas.create_line(0, 0, 0, 0, width=5, fill=Configuration.arrow_color, arrow="last", arrowshape=(25, 25, 10), smooth=True) \
-            if not activity_connection \
-            else Configuration.canvas.create_line(0, 0, 0, 0, width=2, fill=Configuration.activity_arrow_color, arrow="last", arrowshape=(10, 25, 10), smooth=True)
+        self.arrow_color = arrow_color
+        self.arrow_color_selected = arrow_color_selected
+        self.arrow_head_style = arrow_head_style
+        self.line = Configuration.canvas.create_line(0, 0, 0, 0,
+                                                     width=line_width,
+                                                     fill=self.arrow_color,
+                                                     arrow="last",
+                                                     arrowshape=self.arrow_head_style,
+                                                     smooth=True)
         self.end_x = 0
         self.end_y = 0
         self.semaphore_value = semaphore_value
         self.last_change = 0
-        self.activity_connection = activity_connection
         self.selected = False
 
         self.or_connections = {}  # TASKS THAT ALSO INCREASE THIS SEMAPHORE (OR) // STRUCTURE: {taskObject: lineObject}
@@ -43,11 +51,9 @@ class TaskConnector:
         self.offset = offset
 
         self.semaphore_text = Configuration.canvas.create_text(0, 0, text=str(semaphore_value), fill=Configuration.root['bg'], font=("Montserrat Light", 12, "bold"))
-        self.semaphore_bg = Configuration.canvas.create_oval(0, 0, 0, 0, fill=Configuration.arrow_color if not activity_connection else Configuration.activity_arrow_color, outline="")
+        self.semaphore_bg = Configuration.canvas.create_oval(0, 0, 0, 0, fill=self.arrow_color, outline="")
 
         Configuration.canvas.tag_bind(self.line, "<Button-1>", lambda event: self.on_click())
-
-        #Configuration.canvas.pack()
 
     def delete(self):
         """Delete the connector and its associated objects from the canvas."""
@@ -138,10 +144,8 @@ class TaskConnector:
 
         Configuration.canvas.delete(line)
 
-        Configuration.canvas.itemconfig(self.semaphore_bg,
-                                        fill=Configuration.arrow_color if not self.activity_connection else Configuration.activity_arrow_color)
-        Configuration.canvas.itemconfig(self.line,
-                                        fill=Configuration.arrow_color if not self.activity_connection else Configuration.activity_arrow_color)
+        Configuration.canvas.itemconfig(self.semaphore_bg, fill=self.arrow_color)
+        Configuration.canvas.itemconfig(self.line, fill=self.arrow_color)
 
     def on_click(self):
         """Handle the click event on the connector."""
@@ -166,19 +170,12 @@ class TaskConnector:
 
     def update_visuals(self):
         """Update the visual appearance of the connector based on its selection state."""
-        if self.activity_connection:
-            selected_color = Configuration.activity_arrow_color_selected
-            reset_color = Configuration.activity_arrow_color
-        else:
-            selected_color = Configuration.arrow_color_selected
-            reset_color = Configuration.arrow_color
-
         if self.selected:
-            Configuration.canvas.itemconfig(self.line, fill=selected_color)
-            Configuration.canvas.itemconfig(self.semaphore_bg, fill=selected_color, outline=selected_color)
+            Configuration.canvas.itemconfig(self.line, fill=self.arrow_color_selected)
+            Configuration.canvas.itemconfig(self.semaphore_bg, fill=self.arrow_color_selected, outline=self.arrow_color_selected)
         else:
-            Configuration.canvas.itemconfig(self.line, fill=reset_color)
-            Configuration.canvas.itemconfig(self.semaphore_bg, fill=reset_color, outline=reset_color)
+            Configuration.canvas.itemconfig(self.line, fill=self.arrow_color)
+            Configuration.canvas.itemconfig(self.semaphore_bg, fill=self.arrow_color, outline=self.arrow_color)
 
     def update_start(self, new_x, new_y):
         """
@@ -264,9 +261,7 @@ class TaskConnector:
         Args:
             task (Task): The task to add the OR connection to.
         """
-        line_object = Configuration.canvas.create_line(0, 0, 0, 0, width=5, fill=Configuration.arrow_color, smooth=True) \
-            if not self.activity_connection \
-            else Configuration.canvas.create_line(0, 0, 0, 0, width=2, fill=Configuration.activity_arrow_color, smooth=True)
+        line_object = Configuration.canvas.create_line(0, 0, 0, 0, width=5, fill=self.arrow_color, smooth=True)
 
         self.or_connections[task] = line_object
 

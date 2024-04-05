@@ -35,6 +35,7 @@ class Configuration:
 
     # Variable to store reference to the simulation sidebar
     simulation_sidebar = None
+    dynamic_value_label = None
 
     # Dictionaries to store selected tasks and connection
     selected_tasks = {}
@@ -263,3 +264,13 @@ class Configuration:
             task.delete()
 
         Configuration.selected_tasks.clear()
+
+    @staticmethod
+    def toggle_simulation_sidebar():
+        """Toggle visibility of the simulation sidebar."""
+        if Configuration.edit_mode:
+            return
+
+        Configuration.show_simulation_container = not Configuration.show_simulation_container
+        Configuration.toggle_sidebar(Configuration.show_simulation_container)
+        Configuration._update_sidebar()
