@@ -74,6 +74,8 @@ class Configuration:
     auto_run = False
     show_simulation_container = False
 
+
+class SystemFunctions:
     @staticmethod
     def set_mutex_type(new_type_name):
         Configuration.selected_mutex_type = new_type_name
@@ -94,7 +96,7 @@ class Configuration:
     @staticmethod
     def clear_canvas():
         """Clear the canvas and reset general variables."""
-        Configuration.clear_general_variables()
+        SystemFunctions.clear_general_variables()
         Configuration.canvas.delete("all")
 
     @staticmethod
@@ -200,7 +202,7 @@ class Configuration:
             new_number += 1
 
         Configuration.selected_tasks[new_task] = new_number
-        Configuration._update_sidebar()
+        SystemFunctions._update_sidebar()
 
         return new_number
 
@@ -213,7 +215,7 @@ class Configuration:
             task: The task to be removed from the selection.
         """
         Configuration.selected_tasks.pop(task)
-        Configuration._update_sidebar()
+        SystemFunctions._update_sidebar()
 
     @staticmethod
     def confirm_task_change():
@@ -273,7 +275,7 @@ class Configuration:
                 Configuration.sidebar_add_or_connection_container.pack_forget()
                 Configuration.sidebar_simulation.pack_forget()
 
-            Configuration.toggle_sidebar(True)
+            SystemFunctions.toggle_sidebar(True)
 
             Configuration.sidebar_task_input.set(
                 list(Configuration.selected_tasks.keys())[0].task_name
@@ -293,7 +295,7 @@ class Configuration:
             Configuration.sidebar_add_mutex_container.pack_forget()
             Configuration.sidebar_add_or_connection_container.pack_forget()
         else:
-            Configuration.toggle_sidebar(False)
+            SystemFunctions.toggle_sidebar(False)
 
     @staticmethod
     def toggle_sidebar(show=True):
@@ -304,7 +306,7 @@ class Configuration:
             show (bool): Whether to show or hide the sidebar. Defaults to True.
         """
         from threading import Thread
-        t = Thread(target=Configuration._sidebar_animation, args=(show,))
+        t = Thread(target=SystemFunctions._sidebar_animation, args=(show,))
         t.start()
 
     @staticmethod
@@ -360,8 +362,8 @@ class Configuration:
             return
 
         Configuration.show_simulation_container = not Configuration.show_simulation_container
-        Configuration.toggle_sidebar(Configuration.show_simulation_container)
-        Configuration._update_sidebar()
+        SystemFunctions.toggle_sidebar(Configuration.show_simulation_container)
+        SystemFunctions._update_sidebar()
 
     @staticmethod
     def update_speed_value():
@@ -374,7 +376,7 @@ class Configuration:
         # Convert slider value to a delay (in milliseconds)
         Configuration.current_delay = int(3000 + 1 - value)
         print(f"Speed set to {value}, delay {Configuration.current_delay} ms")
-        Configuration.update_speed_value()
+        SystemFunctions.update_speed_value()
 
     @staticmethod
     def step():
@@ -397,17 +399,17 @@ class Configuration:
     def run_periodically():
         """Run the simulation periodically based on the current delay."""
         if Configuration.auto_run:
-            Configuration.step()
+            SystemFunctions.step()
             # Schedule the next call
-            Configuration.root.after(Configuration.current_delay, Configuration.run_periodically)
+            Configuration.root.after(Configuration.current_delay, SystemFunctions.run_periodically)
 
     @staticmethod
     def start_simulation():
         """Start the simulation."""
         if not Configuration.auto_run:
-            Configuration.update_simulation_speed(value=1)
+            SystemFunctions.update_simulation_speed(value=1)
             Configuration.auto_run = True
-            Configuration.run_periodically()
+            SystemFunctions.run_periodically()
 
     # Create sidebar containers
     @staticmethod
@@ -423,11 +425,11 @@ class Configuration:
         sidebar_title = Label(Configuration.sidebar, text="Editor", font=("Montserrat Light", 20), bg="#2A2A2A", fg="white",
                               width=15)
         sidebar_title.pack(side=TOP, anchor=N, padx=0, pady=10)
-        Configuration.create_edit_task_container()
-        Configuration.create_connection_container()
-        Configuration.create_mutex_container()
-        Configuration.create_or_connection_container()
-        Configuration.create_run_container()
+        SystemFunctions.create_edit_task_container()
+        SystemFunctions.create_connection_container()
+        SystemFunctions.create_mutex_container()
+        SystemFunctions.create_or_connection_container()
+        SystemFunctions.create_run_container()
 
     @staticmethod
     def create_run_container():
@@ -437,16 +439,16 @@ class Configuration:
         sidebar_title = Label(Configuration.sidebar_simulation, text="Simulation", font=("Montserrat Light", 20), bg="#2A2A2A", fg="white", width=15)
         sidebar_title.pack(side=TOP, anchor=N, padx=0, pady=10)
 
-        sim_start_button = customtkinter.CTkButton(Configuration.sidebar_simulation, text="Start", command=Configuration.start_simulation)
+        sim_start_button = customtkinter.CTkButton(Configuration.sidebar_simulation, text="Start", command=SystemFunctions.start_simulation)
         sim_start_button.pack(pady=10, padx=10)
 
-        sim_end_button = customtkinter.CTkButton(Configuration.sidebar_simulation, text="Stop", command=Configuration.stop_simulation)
+        sim_end_button = customtkinter.CTkButton(Configuration.sidebar_simulation, text="Stop", command=SystemFunctions.stop_simulation)
         sim_end_button.pack(pady=10, padx=10)
 
         speed_slider = customtkinter.CTkSlider(Configuration.sidebar_simulation, from_=1, to=3000, number_of_steps=3000)
         speed_slider.pack(side=customtkinter.TOP, fill=customtkinter.X, padx=10, pady=10)
         speed_slider.set(1000)  # Set default speed value
-        speed_slider.configure(command=Configuration.update_simulation_speed)
+        speed_slider.configure(command=SystemFunctions.update_simulation_speed)
 
         Configuration.dynamic_value_label = customtkinter.CTkLabel(Configuration.sidebar_simulation, text="Period per Cycle: 1000ms", bg_color=Configuration.root['bg'], fg_color="#303030")
         Configuration.dynamic_value_label.pack(pady=10)
@@ -497,7 +499,7 @@ class Configuration:
 
         # Create a label inside the frame to display button text
         button_label = Button(button_confirm_task_frame, text="CONFIRM SETTINGS", fg="white", bg="#303030", bd=0,
-                              font=("Montserrat Light", 12), command=lambda: Configuration.confirm_task_change(),
+                              font=("Montserrat Light", 12), command=lambda: SystemFunctions.confirm_task_change(),
                               width=20)
         button_label.pack()
 
@@ -515,7 +517,7 @@ class Configuration:
 
         # Create a label inside the frame to display button text
         button_label = Button(button_add_mutex_frame, text="ADD MUTEX", fg="white", bg="#303030", bd=0,
-                              font=("Montserrat Light", 12), command=lambda: Configuration.add_new_mutex(),
+                              font=("Montserrat Light", 12), command=lambda: SystemFunctions.add_new_mutex(),
                               width=20)
         button_label.pack()
 
@@ -528,7 +530,7 @@ class Configuration:
 
         # Create a label inside the frame to display button text
         button_label = Button(button_add_connection_frame, text="ADD CONNECTION", fg="white", bg="#303030", bd=0,
-                              font=("Montserrat Light", 12), command=lambda: Configuration.add_connection(),
+                              font=("Montserrat Light", 12), command=lambda: SystemFunctions.add_connection(),
                               width=20)
         button_label.pack()
 
@@ -546,7 +548,7 @@ class Configuration:
 
         # Create a label inside the frame to display button text
         button_label = Button(button_add_mutex_frame, text="ADD MUTEX", fg="white", bg="#303030", bd=0,
-                              font=("Montserrat Light", 12), command=lambda: Configuration.add_new_mutex(),
+                              font=("Montserrat Light", 12), command=lambda: SystemFunctions.add_new_mutex(),
                               width=20)
         button_label.pack()
 
@@ -564,6 +566,6 @@ class Configuration:
 
         # Create a label inside the frame to display button text
         button_label = Button(button_add_or_connection_frame, text="ADD OR CONNECTION", fg="white", bg="#303030", bd=0,
-                              font=("Montserrat Light", 12), command=lambda: Configuration.add_or_connection(),
+                              font=("Montserrat Light", 12), command=lambda: SystemFunctions.add_or_connection(),
                               width=20)
         button_label.pack()

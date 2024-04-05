@@ -31,7 +31,7 @@ import pandas as pd
 from Objects.DraggableTask import DraggableTask
 from Objects.Connection.ConnectionActivity import ConnectionActivity
 from Objects.Connection.ConnectionTask import ConnectionTask
-from General.Configuration import Configuration
+from General.Configuration import Configuration, SystemFunctions
 import math
 
 # Import available mutex types
@@ -64,7 +64,7 @@ def load_files(show_file_dialog=False):
     table_of_content = pd.read_excel(Configuration.last_import_file_path)
 
     # Clear general variables and canvas
-    Configuration.clear_general_variables()
+    SystemFunctions.clear_general_variables()
     Configuration.canvas.delete("all")
 
     selected_mutex_class_name = "Mutex" + Configuration.selected_mutex_type.replace(' ', '')

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Import necessary modules
-from General.Configuration import Configuration
+from General.Configuration import Configuration, SystemFunctions
 
 
 class DraggableTask:
@@ -77,8 +77,6 @@ class DraggableTask:
         Configuration.canvas.tag_bind(self.name_label, "<B1-Motion>", lambda event: self.on_drag(event))
         Configuration.canvas.tag_bind(self.activity_label, "<B1-Motion>", lambda event: self.on_drag(event))
         Configuration.canvas.tag_bind(self.cycle_label, "<B1-Motion>", lambda event: self.on_drag(event))
-
-        #Configuration.canvas.pack()
 
     def delete(self):
         """Delete the task and its associated elements from the canvas."""
@@ -296,7 +294,7 @@ class DraggableTask:
         print("Clicked on task: " + task_name + activity_name)
         self.selected = not self.selected
         if self.selected:
-            selection_number = Configuration.select_new_task(self)
+            selection_number = SystemFunctions.select_new_task(self)
             Configuration.canvas.itemconfig(self.selection_text, text=str(selection_number))
             Configuration.canvas.itemconfig(self.oval, outline=Configuration.task_color_selected)
         else:
@@ -305,7 +303,7 @@ class DraggableTask:
                 Configuration.canvas.itemconfig(self.oval, outline=Configuration.task_color_running)
             else:
                 Configuration.canvas.itemconfig(self.oval, outline=Configuration.task_color)
-            Configuration.remove_selected_task(self)
+            SystemFunctions.remove_selected_task(self)
 
     @staticmethod
     def switch_selection():
@@ -329,4 +327,4 @@ class DraggableTask:
 
         Configuration.selected_connection = None
 
-        Configuration.toggle_sidebar(show=False)
+        SystemFunctions.toggle_sidebar(show=False)

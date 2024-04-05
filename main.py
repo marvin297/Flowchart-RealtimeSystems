@@ -30,7 +30,7 @@ import customtkinter
 from General.FileOperations import load_files, save_file
 from Objects.DraggableTask import DraggableTask
 from CTkMenuBar import *
-from General.Configuration import Configuration
+from General.Configuration import Configuration, SystemFunctions
 
 # Import available mutex types
 from Objects.Mutex.MutexPriorityInversion import MutexPriorityInversion
@@ -76,30 +76,30 @@ class App(customtkinter.CTk):
         # Create file menu
         filemenu = CustomDropdownMenu(widget=button_file_menu, border_color="")
         filemenu.add_option(option="Save as xslx", command=lambda: save_file())
-        filemenu.add_option(option="Load from xslx", command=lambda: load_files(show_file_dialog=True) or Configuration.stop_simulation())
-        filemenu.add_option(option="Reload file", command=lambda: load_files(show_file_dialog=False) or Configuration.stop_simulation())
+        filemenu.add_option(option="Load from xslx", command=lambda: load_files(show_file_dialog=True) or SystemFunctions.stop_simulation())
+        filemenu.add_option(option="Reload file", command=lambda: load_files(show_file_dialog=False) or SystemFunctions.stop_simulation())
         filemenu.add_separator()
-        filemenu.add_option(option="Clear chart", command=lambda: Configuration.clear_canvas() or Configuration.stop_simulation())
+        filemenu.add_option(option="Clear chart", command=lambda: SystemFunctions.clear_canvas() or SystemFunctions.stop_simulation())
         filemenu.add_option(option="Exit to desktop", command=self.quit)
 
         # Create edit menu
         editmenu = CustomDropdownMenu(widget=button_edit_menu, border_color="")
         editmenu.add_option(option="Edit mode", command=lambda: DraggableTask.switch_selection())
-        editmenu.add_option(option="Add new task", command=lambda: Configuration.add_task())
-        editmenu.add_option(option="Delete selected task", command=lambda: Configuration.delete_selection())
+        editmenu.add_option(option="Add new task", command=lambda: SystemFunctions.add_task())
+        editmenu.add_option(option="Delete selected task", command=lambda: SystemFunctions.delete_selection())
 
         # Create run menu
         runmenu = CustomDropdownMenu(widget=button_run_menu, border_color="")
-        runmenu.add_option(option="Next step", command=Configuration.step)
-        runmenu.add_option(option="Hide/Show Simulation Sidebar", command=Configuration.toggle_simulation_sidebar)
+        runmenu.add_option(option="Next step", command=SystemFunctions.step)
+        runmenu.add_option(option="Hide/Show Simulation Sidebar", command=SystemFunctions.toggle_simulation_sidebar)
 
         # Create mutex selection menu
         mutexmenu = CustomDropdownMenu(widget=button_mutex_menu, border_color="")
         for available_mutex_type_name in Configuration.available_mutex_types:
-            mutexmenu.add_option(option="Load using " + available_mutex_type_name, command=lambda: Configuration.set_mutex_type(available_mutex_type_name))
+            mutexmenu.add_option(option="Load using " + available_mutex_type_name, command=lambda: SystemFunctions.set_mutex_type(available_mutex_type_name))
 
         # Create sidebars
-        Configuration.create_sidebar()
+        SystemFunctions.create_sidebar()
 
 
 if __name__ == "__main__":

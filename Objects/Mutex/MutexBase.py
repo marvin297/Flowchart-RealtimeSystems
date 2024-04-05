@@ -23,8 +23,6 @@ class MutexBase(ABC):
                                                             fill=Configuration.mutex_color,
                                                             outline=Configuration.mutex_color)
 
-        #Configuration.canvas.pack()
-
     def add_task(self, task):
         self.connected_tasks.append(task)
         self.lines.append(Configuration.canvas.create_line(0, 0, 0, 0, fill=Configuration.mutex_color, width=5))
@@ -75,7 +73,7 @@ class MutexBase(ABC):
         Configuration.canvas.coords(self.locked_text, new_x, new_y + 10)
         padding = 20
         edge_padding = -5
-        #GeneralVariables.canvas.coords(self.mutex_bg, new_x - text_width / 2, new_y - text_width / 2, new_x + text_width / 2, new_y + text_width / 2)
+
         Configuration.canvas.coords(self.mutex_bg, [
                                             new_x - text_width / 2 - padding, new_y,
                                             new_x - text_width / 2 + edge_padding,  new_y + text_height / 2 + padding,

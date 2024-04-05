@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Import necessary modules
-from General.Configuration import Configuration
+from General.Configuration import Configuration, SystemFunctions
 import time
 import math
 from abc import ABC
@@ -166,7 +166,7 @@ class ConnectionBase(ABC):
 
         self.update_visuals()
 
-        Configuration._update_sidebar()
+        SystemFunctions._update_sidebar()
 
     def update_visuals(self):
         """Update the visual appearance of the connector based on its selection state."""
