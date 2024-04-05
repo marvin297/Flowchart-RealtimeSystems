@@ -32,12 +32,6 @@ from Objects.DraggableTask import DraggableTask
 from CTkMenuBar import *
 from General.Configuration import Configuration, SystemFunctions
 
-# Import available mutex types
-from Objects.Mutex.MutexPriorityInversion import MutexPriorityInversion
-from Objects.Mutex.MutexPriorityCeiling import MutexPriorityCeiling
-from Objects.Mutex.MutexTicketLock import MutexTicketLock
-from Objects.Mutex.MutexFirstComeFirstServe import MutexFirstComeFirstServe
-
 
 class App(customtkinter.CTk):
     """Main application class."""
