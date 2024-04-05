@@ -1,4 +1,4 @@
-from Mutex.MutexBase import MutexBase
+from Objects.Mutex.MutexBase import MutexBase
 
 class MutexTicketLock(MutexBase):
     def __init__(self):

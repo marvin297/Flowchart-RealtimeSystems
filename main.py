@@ -31,13 +31,13 @@ from General.FileOperations import load_files, save_file
 from Objects.DraggableTask import DraggableTask
 from CTkMenuBar import *
 from General.Configuration import Configuration
-from Objects.TaskConnector import TaskConnector
+from Objects.Connection.TaskConnection import TaskConnector
 
 # Import available mutex types
-from Mutex.MutexPriorityInversion import MutexPriorityInversion
-from Mutex.MutexPriorityCeiling import MutexPriorityCeiling
-from Mutex.MutexTicketLock import MutexTicketLock
-from Mutex.MutexFirstComeFirstServe import MutexFirstComeFirstServe
+from Objects.Mutex.MutexPriorityInversion import MutexPriorityInversion
+from Objects.Mutex.MutexPriorityCeiling import MutexPriorityCeiling
+from Objects.Mutex.MutexTicketLock import MutexTicketLock
+from Objects.Mutex.MutexFirstComeFirstServe import MutexFirstComeFirstServe
 
 
 class App(customtkinter.CTk):

@@ -29,14 +29,14 @@ It also utilizes the pandas library to read from and write to Excel files.
 from tkinter import filedialog
 import pandas as pd
 from Objects.DraggableTask import DraggableTask
-from Objects.TaskConnector import TaskConnector
+from Objects.Connection.TaskConnection import TaskConnector
 from General.Configuration import Configuration
 
 # Import available mutex types
-from Mutex.MutexPriorityInversion import MutexPriorityInversion
-from Mutex.MutexPriorityCeiling import MutexPriorityCeiling
-from Mutex.MutexTicketLock import MutexTicketLock
-from Mutex.MutexFirstComeFirstServe import MutexFirstComeFirstServe
+from Objects.Mutex.MutexPriorityInversion import MutexPriorityInversion
+from Objects.Mutex.MutexPriorityCeiling import MutexPriorityCeiling
+from Objects.Mutex.MutexTicketLock import MutexTicketLock
+from Objects.Mutex.MutexFirstComeFirstServe import MutexFirstComeFirstServe
 
 
 # Function to load files from a file dialog or a predefined path
