@@ -30,6 +30,8 @@ class Configuration:
     sidebar_add_connection_container = None
     sidebar_add_mutex_container = None
     sidebar_add_or_connection_container = None
+    sidebar_edit_connection_container = None
+    sidebar_connection_input = None
     sidebar_task_input = None
     sidebar_activity_input = None
     sidebar_cycles_input = None
@@ -104,8 +106,11 @@ class SystemFunctions:
         """Add a new task to the canvas."""
         from Objects.DraggableTask import DraggableTask
 
+        task_name = str(len(Configuration.task_objects) + 1)
+        activity_name = "a"
+
         print("Add task")
-        new_task = DraggableTask("?", "?", Configuration.root.winfo_width() / 2, Configuration.root.winfo_height() / 2,
+        new_task = DraggableTask(task_name, activity_name, Configuration.root.winfo_width() / 2, Configuration.root.winfo_height() / 2,
                                  50, 1, 0)
         Configuration.task_objects.append(new_task)
 
@@ -114,6 +119,8 @@ class SystemFunctions:
         """Add a new connection to the canvas."""
         from Objects.Connection.ConnectionActivity import ConnectionActivity
         from Objects.Connection.ConnectionTask import ConnectionTask
+
+        name = "Connection" + str(len(Configuration.connector_objects) + 1)
 
         print("Add connection")
         origin_task = \
@@ -129,9 +136,9 @@ class SystemFunctions:
 
         is_activity_connection = origin_task.task_name == target_task.task_name
         if is_activity_connection:
-            new_connection = ConnectionActivity("?", 0, new_offset)
+            new_connection = ConnectionActivity(name, 0, new_offset)
         else:
-            new_connection = ConnectionTask("?", 0, new_offset)
+            new_connection = ConnectionTask(name, 0, new_offset)
 
         origin_task.add_connector(new_connection, "start")
         target_task.add_connector(new_connection, "end")
@@ -144,7 +151,7 @@ class SystemFunctions:
         end_task_name = target_task.task_name + target_task.activity_name
         initial_value = 0
 
-        Configuration.connector_objects.append([start_task_name, connector_name, end_task_name, initial_value])
+        Configuration.connector_objects.append([start_task_name, connector_name, end_task_name, initial_value, new_connection])
 
     @staticmethod
     def add_or_connection():
@@ -159,7 +166,8 @@ class SystemFunctions:
         Configuration.connector_objects.append([sel_task.task_name + sel_task.activity_name,
                                                 Configuration.selected_connection.name,
                                                 "",
-                                                0])
+                                                0,
+                                                Configuration.selected_connection])
 
     @staticmethod
     def add_new_mutex():
@@ -241,7 +249,25 @@ class SystemFunctions:
         Update the sidebar based on the currently selected tasks and connection.
         Show/hide the appropriate sidebar containers based on the selection.
         """
-        if len(Configuration.selected_tasks) > 0:
+        SystemFunctions.toggle_sidebar(True)
+        if Configuration.selected_connection is not None and len(Configuration.selected_tasks) == 0:
+
+            for list_entry in Configuration.connector_objects:
+                if list_entry[4] == Configuration.selected_connection:
+                    Configuration.sidebar_connection_input.set(list_entry[3])
+                    break
+
+            Configuration.sidebar_edit_connection_container.pack(
+                fill="both", expand=True
+            )
+            Configuration.sidebar_add_or_connection_container.pack_forget()
+            Configuration.sidebar_add_connection_container.pack_forget()
+            Configuration.sidebar_edit_task_container.pack_forget()
+            Configuration.sidebar_add_mutex_container.pack_forget()
+            Configuration.sidebar_simulation.pack_forget()
+        elif len(Configuration.selected_tasks) > 0:
+            Configuration.sidebar_edit_connection_container.pack_forget()
+
             if Configuration.selected_connection is not None:
                 Configuration.sidebar_add_or_connection_container.pack(
                     fill="both", expand=True
@@ -275,8 +301,6 @@ class SystemFunctions:
                 Configuration.sidebar_add_or_connection_container.pack_forget()
                 Configuration.sidebar_simulation.pack_forget()
 
-            SystemFunctions.toggle_sidebar(True)
-
             Configuration.sidebar_task_input.set(
                 list(Configuration.selected_tasks.keys())[0].task_name
             )
@@ -294,6 +318,7 @@ class SystemFunctions:
             Configuration.sidebar_edit_task_container.pack_forget()
             Configuration.sidebar_add_mutex_container.pack_forget()
             Configuration.sidebar_add_or_connection_container.pack_forget()
+            Configuration.sidebar_edit_connection_container.pack_forget()
         else:
             SystemFunctions.toggle_sidebar(False)
 
@@ -421,6 +446,7 @@ class SystemFunctions:
         Configuration.sidebar_task_input = StringVar()
         Configuration.sidebar_activity_input = StringVar()
         Configuration.sidebar_cycles_input = IntVar()
+        Configuration.sidebar_connection_input = IntVar()
 
         sidebar_title = Label(Configuration.sidebar, text="Editor", font=("Montserrat Light", 20), bg="#2A2A2A", fg="white",
                               width=15)
@@ -430,6 +456,7 @@ class SystemFunctions:
         SystemFunctions.create_mutex_container()
         SystemFunctions.create_or_connection_container()
         SystemFunctions.create_run_container()
+        SystemFunctions.create_edit_connection_container()
 
     @staticmethod
     def create_run_container():
@@ -569,3 +596,43 @@ class SystemFunctions:
                               font=("Montserrat Light", 12), command=lambda: SystemFunctions.add_or_connection(),
                               width=20)
         button_label.pack()
+
+    @staticmethod
+    def create_edit_connection_container():
+        """Edit connection container in the sidebar."""
+        Configuration.sidebar_edit_connection_container = Frame(Configuration.sidebar, bd=0, bg="#303030")
+
+        connection_name_frame = Frame(Configuration.sidebar_edit_connection_container, bd=0, bg="#2A2A2A", height=30)
+        connection_name_frame.place(relx=0, rely=0, x=15, y=100)
+        connection_name_title = Label(connection_name_frame, text="Initial semaphore value", font=("Montserrat Light", 10), bg="#2A2A2A",
+                                fg="white", width=15)
+        connection_name_title.pack(side=TOP, anchor=N, padx=0, pady=5)
+        connection_name_input = Entry(connection_name_frame, font=("Montserrat Light", 10), bd=0, bg="#303030", fg="white",
+                                insertbackground="white", width=20, textvariable=Configuration.sidebar_connection_input,
+                                borderwidth=10, relief="flat")
+        connection_name_input.pack(side=TOP, anchor=N, padx=15, pady=15)
+
+        # Create a frame to simulate the button appearance
+        button_add_or_connection_frame = Frame(Configuration.sidebar_edit_connection_container, bg="#303030", bd=1,
+                                               relief="solid",
+                                               highlightbackground=Configuration.task_color,
+                                               highlightthickness=1)
+        button_add_or_connection_frame.pack(side=BOTTOM, anchor=N, padx=10, pady=10)
+
+        # Create a label inside the frame to display button text
+        button_label = Button(button_add_or_connection_frame, text="CONFIRM SETTINGS", fg="white", bg="#303030", bd=0,
+                              font=("Montserrat Light", 12), command=lambda: SystemFunctions.set_semaphore_value(),
+                              width=20)
+        button_label.pack()
+
+    @staticmethod
+    def set_semaphore_value():
+        """Set the semaphore value for the selected connection."""
+        Configuration.selected_connection.semaphore_value = int(Configuration.sidebar_connection_input.get())
+
+        for list_entry in Configuration.connector_objects:
+            if list_entry[4] == Configuration.selected_connection:
+                list_entry[3] = Configuration.selected_connection.semaphore_value
+                break
+
+        Configuration.selected_connection.update_visuals()

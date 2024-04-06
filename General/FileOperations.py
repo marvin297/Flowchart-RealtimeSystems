@@ -180,6 +180,8 @@ def load_files(show_file_dialog=False):
     # List to store duplicate semaphore indices
     duplicates = []
 
+    print(semaphores)
+
     # Iterate over semaphores and handle connections
     for i in range(len(semaphores)):
         semaphore = semaphores[i]
@@ -205,7 +207,8 @@ def load_files(show_file_dialog=False):
                     needed_connector.add_or_connection(task)
                     task.add_connector(needed_connector, "or")
                     task.update_connections()
-            break
+                    break
+            continue
 
         # Handle duplicate semaphores
         for j in range(len(semaphores)):
@@ -237,7 +240,7 @@ def load_files(show_file_dialog=False):
         # Create a new TaskConnector object
         if connector is None:
             connector = ConnectionTask(connector_name, initial_value, offset)
-        Configuration.connector_objects.append([start_task_name, connector_name, end_task_name, initial_value])
+        Configuration.connector_objects.append([start_task_name, connector_name, end_task_name, initial_value, connector])
 
         # Add connector to start and end tasks
         for task in Configuration.task_objects:

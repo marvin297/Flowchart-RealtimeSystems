@@ -31,6 +31,7 @@ class ConnectionBase(ABC):
         """
         self.name = name
         self.circle_radius = 50
+        self.line_width = line_width
         self.arrow_color = arrow_color
         self.arrow_color_selected = arrow_color_selected
         self.arrow_head_style = arrow_head_style
@@ -52,6 +53,8 @@ class ConnectionBase(ABC):
 
         self.semaphore_text = Configuration.canvas.create_text(0, 0, text=str(semaphore_value), fill=Configuration.root['bg'], font=("Montserrat Light", 12, "bold"))
         self.semaphore_bg = Configuration.canvas.create_oval(0, 0, 0, 0, fill=self.arrow_color, outline="")
+
+        self.animation_running = False
 
         Configuration.canvas.tag_bind(self.line, "<Button-1>", lambda event: self.on_click())
 
@@ -107,13 +110,25 @@ class ConnectionBase(ABC):
         arrow_length = 15
         max_length = (c - self.circle_radius) / 2 - arrow_length
 
-        color = "red" if decrement else "green"
+        if not self.animation_running:
+            self.animation_running = True
+            color = "red" if decrement else "green"
+        else:
+            color = "orange"
+
         highlight_color = "#f74545" if decrement else "#61ff4a"
+
+        #if self.line.bg == "red" or self.line.bg == "green":
+        #    color = "orange"
+        print(Configuration.canvas.itemconfig(self.line))
 
         line = Configuration.canvas.create_line(0, 0, 0, 0, width=5, fill=highlight_color, arrow="last",
                                                 arrowshape=(arrow_length, arrow_length, 1.5), smooth=True)
         Configuration.canvas.itemconfig(self.semaphore_bg, fill=color)
         Configuration.canvas.itemconfig(self.line, fill=color)
+
+        for task in self.or_connections:
+            Configuration.canvas.itemconfig(self.or_connections[task], fill=color)
 
         for i in range(0, 100, 1):
             if decrement:
@@ -147,6 +162,11 @@ class ConnectionBase(ABC):
         Configuration.canvas.itemconfig(self.semaphore_bg, fill=self.arrow_color)
         Configuration.canvas.itemconfig(self.line, fill=self.arrow_color)
 
+        for task in self.or_connections:
+            Configuration.canvas.itemconfig(self.or_connections[task], fill=self.arrow_color)
+
+        self.animation_running = False
+
     def on_click(self):
         """Handle the click event on the connector."""
         print("selected")
@@ -170,6 +190,7 @@ class ConnectionBase(ABC):
 
     def update_visuals(self):
         """Update the visual appearance of the connector based on its selection state."""
+        Configuration.canvas.itemconfig(self.semaphore_text, text=str(self.semaphore_value))
         if self.selected:
             Configuration.canvas.itemconfig(self.line, fill=self.arrow_color_selected)
             Configuration.canvas.itemconfig(self.semaphore_bg, fill=self.arrow_color_selected, outline=self.arrow_color_selected)
@@ -261,7 +282,7 @@ class ConnectionBase(ABC):
         Args:
             task (Task): The task to add the OR connection to.
         """
-        line_object = Configuration.canvas.create_line(0, 0, 0, 0, width=5, fill=self.arrow_color, smooth=True)
+        line_object = Configuration.canvas.create_line(0, 0, 0, 0, width=self.line_width, fill=self.arrow_color, smooth=True)
 
         self.or_connections[task] = line_object
 
