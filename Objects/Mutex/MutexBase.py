@@ -24,23 +24,50 @@ class MutexBase(ABC):
                                                             outline=Configuration.mutex_color)
 
     def add_task(self, task):
+        """
+        Add a task to the mutex lock.
+
+        :param task:
+        :return:
+        """
         self.connected_tasks.append(task)
         self.lines.append(Configuration.canvas.create_line(0, 0, 0, 0, fill=Configuration.mutex_color, width=5))
 
     @abstractmethod
     def attend(self, task):
+        """
+        Attend the mutex lock.
+
+        :param task:
+        :return:
+        """
         pass
 
     @abstractmethod
     def evaluate(self):
+        """
+        Evaluate the mutex lock.
+
+        :return:
+        """
         pass
 
     @abstractmethod
     def release(self, task):
+        """
+        Release the mutex lock.
+
+        :param task:
+        :return:
+        """
         pass
 
     def update_visuals(self):
-        # TODO: display current algorithm type with 'algorithm_type' variable
+        """
+        Update the visuals of the mutex object.
+
+        :return:
+        """
 
         # iterate over connected tasks name
         mutex_name = "m" + "".join([task.task_name for task in self.connected_tasks])
