@@ -1,4 +1,5 @@
 ### Flowchart-RealtimeSystems
+by Marvin Geiger and Marlon Oberberger
 
 This project creates a flow chart visualization using Python and the Tkinter GUI toolkit. It allows users to create and manage tasks represented as oval shapes on a canvas. Tasks can be connected to each other, participate in mutexes, and display relevant information such as task name, activity name, and current cycle.
 
