@@ -336,6 +336,12 @@ class SystemFunctions:
 
     @staticmethod
     def _sidebar_animation(show):
+        """
+        Animate the sidebar to show or hide based on the show parameter.
+
+        :param show: Whether to show or hide the sidebar.
+        :return:
+        """
         import time
 
         if Configuration.sidebar.winfo_x() == -300 and show:
