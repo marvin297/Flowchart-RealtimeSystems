@@ -61,7 +61,6 @@ This project creates a flow chart visualization using Python and the Tkinter GUI
 
 ### Creating a template
 To create a template for creating your own diagram, you need to execute the following steps:
-
 1. Run the software
 2. In the menu-bar click on `file`
 3. Click on `Save as xslx`
@@ -71,7 +70,6 @@ To create a template for creating your own diagram, you need to execute the foll
 ### Loading an example file
 We have provided some demo files for exploring our Flowchart editor and visualizer.
 To load a file from disk, you need to:
-
 1. Run the software
 2. In the menu-bar locate and click on `file`
 3. Click on `Load from xslx`
@@ -83,6 +81,17 @@ To load a file from disk, you need to:
    * data3.xslx
    * ... (see repository root)
 6. Click on `Load`
+
+### Starting a simulation
+To start the simulation it is *REQUIRED* to load a file beforehand. (see section above)
+Also ensure that you are not in EDIT mode (disabled by default after each restart of the software).
+On the menu-bar locate and click on `Run`. You can now either choose manual mode by clicking `Next step`, which simulates a single clock input and thus advances the system by one cycle *OR* you can use the "Simulation Feature":
+1. Click on `Hide/Show Simulation Bar`.
+2. Now the simulation menu should show up at the right side of the window.
+3. Drag the slider with your mouse cursor to a desired delay value between cycles (left click).
+4. Press the `Start` button to begin the simulation
+5. To Halt the simulation press the `Stop` button
+6. To resume the simulation, just press `Start` again
 
 ## Configuration
 
