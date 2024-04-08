@@ -57,9 +57,45 @@ This project creates a flow chart visualization using Python and the Tkinter GUI
 
 5. Customize task and connector appearance using the provided options.
 
+## Getting Started
+
+### Creating a template
+To create a template for creating your own diagram, you need to execute the following steps:
+
+1. Run the software
+2. In the menu-bar click on `file`
+3. Click on `Save as xslx`
+4. Save the template at your desired path and give it a name
+5. Click on the `Save` button to store the template
+
+### Loading an example file
+We have provided some demo files for exploring our Flowchart editor and visualizer.
+To load a file from disk, you need to:
+
+1. Run the software
+2. In the menu-bar locate and click on `file`
+3. Click on `Load from xslx`
+4. A system prompt will open and you can locate a file you want to open. _To open the examples, you need to locate this project's root (or download the *above* provided xslx-files seperately). All example files are located there:_
+   * ring.xslx
+   * ring2.xslx
+   * test.xslx
+   * data2.xslx
+   * data3.xslx
+   * ... (see repository root)
+6. Click on `Load`
+
 ## Configuration
 
 The `Configuration` class in `Configuration.py` contains various settings and references used throughout the project. You can modify these settings to customize the behavior and appearance of the application.
+
+## Q&A
+### I cannot get the project to start
+Try installing all required libraries if any are missing.
+If none of this helps, ensure that your OS is supported. Currently only Windows 10/11 is supported.
+
+### I want to modify the source code
+We used PyCharm by Jetbrains for developing this software. Also Visual Studio Code with the required plugins will work certainly.
+
 
 ## License
 
