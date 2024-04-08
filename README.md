@@ -39,6 +39,7 @@ This project creates a flow chart visualization using Python and the Tkinter GUI
    ```
    pip install customtkinter
    pip install CTkMenuBar
+   pip install tkextrafont
    ```
 
 ## Usage
