@@ -86,12 +86,33 @@ To load a file from disk, you need to:
 To start the simulation it is *REQUIRED* to load a file beforehand. (see section above)
 Also ensure that you are not in EDIT mode (disabled by default after each restart of the software).
 On the menu-bar locate and click on `Run`. You can now either choose manual mode by clicking `Next step`, which simulates a single clock input and thus advances the system by one cycle *OR* you can use the "Simulation Feature":
-1. Click on `Hide/Show Simulation Bar`.
+1. Click on `Hide/Show Simulation Sidebar`.
 2. Now the simulation menu should show up at the right side of the window.
 3. Drag the slider with your mouse cursor to a desired delay value between cycles (left click).
 4. Press the `Start` button to begin the simulation
 5. To Halt the simulation press the `Stop` button
 6. To resume the simulation, just press `Start` again
+
+You can reload the file at any time by locating `File` in the menu bar and clicking on `Reload file`.
+
+### Edit a file
+To edit a file, be sure to hide the simulation bar from the left side of the window. If it is still present, locate `Run` in the menu bar and click on `Hide/Show Simulation Sidebar`. Otherwise the edit mode is not available.
+
+1. Locate `Edit` on the menu-bar and click on it.
+2. Click on ONE task, it is now highlighted in dark blue. You can now adjust the following parameters:
+   * Task Name
+   * Activity Name
+   * Amount of cycles the task needs for completion
+3. If you click on MORE THAN ONE task, you can either set a connection (including semaphore) or a mutex. YOu can select multiple tasks by clicking on them. To reverse the direction of aconnection you need to select the sourcefirst and then the destination task.
+
+To add a new task, you need to click on `Edit` > `Add new task`. By dragging the task with your mouse, you can move the task to a preferred place. If this doesn't work and the task just gets highlighted dark-blue, be sure to deselect `Edit` > `Edit mode` in the menu-bar.
+
+**!Caution!**: Remember to save your new flowchart that you just created/edited:
+1. In the menu-bar click on `File`
+2. Click on `Save as xslx`
+3. Save the file at your desired path and give it a meaningful name <sub>:)</sub>
+4. Click on the `Save` button to store the file
+
 
 ## Configuration
 
