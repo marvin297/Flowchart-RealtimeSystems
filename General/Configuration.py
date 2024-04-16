@@ -530,7 +530,7 @@ class SystemFunctions:
         cycles_input.pack(side=TOP, anchor=N, padx=15, pady=15)
 
         priority_frame = Frame(Configuration.sidebar_edit_task_container, bd=0, bg="#2A2A2A", height=30)
-        priority_frame.place(relx=0, rely=0, x=15, y=320)
+        priority_frame.place(relx=0, rely=0, x=15, y=430)
         priority_title = Label(priority_frame, text="Priority", font=("Montserrat Light", 10),
                              bg="#2A2A2A",
                              fg="white", width=15)
