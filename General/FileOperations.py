@@ -267,7 +267,7 @@ def save_file():
     task_values = [task.task_name for task in Configuration.task_objects]
     activity_values = [task.activity_name for task in Configuration.task_objects]
     cycle_values = [task.task_max_cycles for task in Configuration.task_objects]
-    priority_values = [0 for i in range(len(Configuration.task_objects))]
+    priority_values = [task.original_priority for task in Configuration.task_objects]
     mutex_values = [",".join([mutex.name for mutex in task.mutexes]) for task in Configuration.task_objects]
     pos_x_values = [task.get_position()[0] + 50 for task in Configuration.task_objects]
     pos_y_values = [task.get_position()[1] + 50 for task in Configuration.task_objects]

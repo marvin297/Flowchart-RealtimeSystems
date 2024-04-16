@@ -35,6 +35,7 @@ class Configuration:
     sidebar_task_input = None
     sidebar_activity_input = None
     sidebar_cycles_input = None
+    sidebar_priority_input = None
     sidebar_simulation = None
 
     # Variable to store reference to the simulation sidebar
@@ -236,10 +237,12 @@ class SystemFunctions:
         task_input = Configuration.sidebar_task_input.get()
         activity_input = Configuration.sidebar_activity_input.get()
         cycle_input = Configuration.sidebar_cycles_input.get()
+        priority_input = Configuration.sidebar_priority_input.get()
 
         task.task_name = task_input
         task.activity_name = activity_input
         task.task_max_cycles = cycle_input
+        task.original_priority = priority_input
 
         task.update_visuals()
 
@@ -285,6 +288,7 @@ class SystemFunctions:
                 Configuration.sidebar_add_or_connection_container.pack_forget()
                 Configuration.sidebar_simulation.pack_forget()
             elif len(Configuration.selected_tasks) == 1:
+                Configuration.sidebar_priority_input.set(list(Configuration.selected_tasks.keys())[0].original_priority)
                 Configuration.sidebar_edit_task_container.pack(
                     fill="both", expand=True
                 )
@@ -453,6 +457,7 @@ class SystemFunctions:
         Configuration.sidebar_activity_input = StringVar()
         Configuration.sidebar_cycles_input = IntVar()
         Configuration.sidebar_connection_input = IntVar()
+        Configuration.sidebar_priority_input = IntVar()
 
         sidebar_title = Label(Configuration.sidebar, text="Editor", font=("Montserrat Light", 20), bg="#2A2A2A", fg="white",
                               width=15)
@@ -523,6 +528,18 @@ class SystemFunctions:
                              borderwidth=10,
                              relief="flat")
         cycles_input.pack(side=TOP, anchor=N, padx=15, pady=15)
+
+        priority_frame = Frame(Configuration.sidebar_edit_task_container, bd=0, bg="#2A2A2A", height=30)
+        priority_frame.place(relx=0, rely=0, x=15, y=320)
+        priority_title = Label(priority_frame, text="Priority", font=("Montserrat Light", 10),
+                             bg="#2A2A2A",
+                             fg="white", width=15)
+        priority_title.pack(side=TOP, anchor=N, padx=0, pady=5)
+        priority_input = Entry(priority_frame, font=("Montserrat Light", 10), bd=0, bg="#303030", fg="white",
+                             insertbackground="white", width=20, textvariable=Configuration.sidebar_priority_input,
+                             borderwidth=10,
+                             relief="flat")
+        priority_input.pack(side=TOP, anchor=N, padx=15, pady=15)
 
         # Create a frame to simulate the button appearance
         button_confirm_task_frame = Frame(Configuration.sidebar_edit_task_container, bg="#303030", bd=1, relief="solid",
